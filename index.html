@@ -1,0 +1,1102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>ClosenStein — Brutal Cuban Cockpit (v1)</title>
+
+<style>
+:root{
+  --jg-green:#0bb852;
+  --jg-deep:#0a7a3a;
+  --bg:#f5fbf7;
+  --card:#ffffff;
+  --line:#dbe8df;
+  --text:#102316;
+  --muted:#6c7a71;
+  --warn:#ffb100;
+  --danger:#ef4444;
+  --info:#2563eb;
+  --shadow: 0 10px 22px rgba(0,0,0,.06);
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  font-size:16px;
+}
+
+header{
+  display:flex;align-items:center;gap:12px;
+  padding:10px 14px;border-bottom:1px solid var(--line);
+  background:#fff;position:sticky;top:0;z-index:60;
+}
+.logo{
+  width:40px;height:40px;border-radius:10px;
+  background:linear-gradient(135deg,var(--jg-green),var(--jg-deep));
+  display:grid;place-items:center;color:#fff;font-weight:900;font-size:18px;
+  user-select:none;
+}
+h1{margin:0;font-size:18px;line-height:1.1}
+.sub{font-size:12px;color:var(--muted);margin-top:2px}
+
+.container{max-width:1120px;margin:12px auto 60px;padding:0 12px 18px}
+
+/* Top controls */
+.topbar{
+  display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;
+  background:#fff;border:1px solid var(--line);border-radius:14px;padding:10px 12px;
+  box-shadow:var(--shadow);margin-bottom:10px;
+}
+.topbar-left{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.topbar-right{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.mini{
+  font-size:12px;color:var(--muted);
+  background:#f7fbf8;border:1px solid var(--line);
+  padding:6px 10px;border-radius:999px;
+  display:flex;gap:8px;align-items:center;
+}
+.mini input, .mini select{
+  padding:6px 10px;border-radius:999px;border:1px solid #ccd8cf;font-size:12px;background:#fff;
+}
+.mini input{width:160px}
+.mini select{width:170px}
+
+/* Step tracker (sticky under header) */
+.tracker{
+  position:sticky;top:62px;z-index:55;
+  background:#fff;border:1px solid var(--line);border-radius:14px;
+  box-shadow:var(--shadow);padding:10px 12px;margin-bottom:10px;
+}
+.tr-row{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
+.steps{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.step-pill{
+  border:1px solid var(--line);
+  background:#f3faf6;
+  color:var(--muted);
+  border-radius:999px;
+  padding:6px 10px;
+  font-size:12px;
+  cursor:pointer;
+  display:flex;gap:6px;align-items:center;
+  user-select:none;
+}
+.step-pill.active{
+  background:var(--jg-deep);
+  color:#fff;
+  border-color:var(--jg-deep);
+  font-weight:800;
+}
+.dot{width:9px;height:9px;border-radius:99px;background:#cbd5cf;display:inline-block}
+.dot.ok{background:var(--jg-green)}
+.dot.bad{background:var(--danger)}
+.dot.warn{background:var(--warn)}
+.tr-status{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.badge{
+  display:inline-block;padding:3px 8px;border-radius:999px;font-size:12px;
+  border:1px solid var(--line);background:#f5faf7;
+}
+.badge.green{background:#e8fbf0;border-color:#c6e8d0;color:#0a7a3a;font-weight:900}
+.badge.danger{background:#fee2e2;border-color:#fecaca;color:#b91c1c;font-weight:900}
+.badge.warn{background:#fff7da;border-color:#fde68a;color:#7a4b00;font-weight:900}
+.badge.info{background:#dbeafe;border-color:#bfdbfe;color:#1d4ed8;font-weight:800}
+
+/* Tabs */
+.tabs{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap}
+.tab-btn{
+  border-radius:999px;border:1px solid var(--line);
+  padding:7px 13px;font-size:14px;cursor:pointer;
+  background:#f3faf6;color:var(--muted);
+}
+.tab-btn.active{background:var(--jg-deep);color:#fff;border-color:var(--jg-deep);font-weight:850}
+.tab-content{display:none}
+.tab-content.active{display:block}
+
+.card{
+  background:var(--card);border-radius:14px;border:1px solid var(--line);
+  padding:14px 15px;margin-bottom:10px;box-shadow:var(--shadow);
+}
+h2{margin:0 0 6px;font-size:17px}
+h3{margin:12px 0 6px;font-size:15px}
+.hint{font-size:13px;color:var(--muted);margin:0 0 8px}
+
+.row{display:flex;flex-wrap:wrap;gap:10px}
+.col{flex:1 1 240px}
+
+label{font-size:14px;font-weight:750;display:block;margin-bottom:4px}
+input, select, textarea{
+  width:100%;padding:8px 10px;border-radius:12px;
+  border:1px solid #ccd8cf;font-size:15px;font-family:inherit;background:#fff;
+}
+textarea{min-height:170px;resize:vertical;font-size:13px;line-height:1.4;white-space:pre-wrap}
+
+.quote{
+  border-radius:12px;border:2px solid var(--warn);
+  background:#fff9e6;padding:10px 12px;font-size:14px;white-space:pre-wrap;
+}
+.script{
+  border-radius:12px;border:1px dashed var(--line);
+  background:#fafdfb;padding:10px 12px;font-size:14px;white-space:pre-wrap;
+}
+
+.checkgrid{display:grid;grid-template-columns:20px 1fr;gap:8px 10px;align-items:start}
+.checkgrid input[type=checkbox]{margin-top:3px;transform:scale(1.05)}
+
+.btn{
+  border:none;border-radius:999px;padding:8px 14px;font-size:14px;cursor:pointer;
+  display:inline-flex;align-items:center;gap:6px;white-space:nowrap;
+}
+.btn-primary{background:linear-gradient(135deg,var(--jg-green),var(--jg-deep));color:#fff}
+.btn-ghost{background:#f0f5f2;color:var(--text);border:1px solid var(--line)}
+.btn-danger{background:#fee2e2;color:#991b1b;border:1px solid #fecaca}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+
+.warnbox{
+  display:none;
+  border-radius:12px;border:2px solid var(--danger);
+  background:#fff1f2;padding:10px 12px;font-size:13px;white-space:pre-wrap;
+}
+.warnbox.show{display:block}
+
+.divider{margin:12px 0;border:none;border-top:1px solid var(--line)}
+
+.kpi-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:6px}
+.kpi{
+  flex:1 1 180px;border-radius:12px;border:1px solid var(--line);
+  background:#fff;padding:8px 10px;font-size:13px
+}
+.kpi strong{display:block;font-size:15px;margin-bottom:2px}
+.tiny{font-size:11px;color:var(--muted)}
+
+.footer{
+  display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;
+  border-top:1px solid var(--line);margin-top:10px;padding-top:10px;
+}
+</style>
+</head>
+
+<body>
+<header>
+  <div class="logo">JG</div>
+  <div>
+    <h1>ClosenStein — Brutal Cuban Cockpit</h1>
+    <div class="sub">Opener → Post-Credit → Enroll → Objections • Gates + Locks • One path only</div>
+  </div>
+</header>
+
+<div class="container">
+
+  <!-- TOP BAR -->
+  <div class="topbar">
+    <div class="topbar-left">
+      <div class="mini">
+        <strong>Client:</strong>
+        <input id="clientName" placeholder="Michael" />
+        <span class="badge info" id="clientBadge">Not set</span>
+      </div>
+
+      <div class="mini">
+        <strong>Rep:</strong>
+        <input id="repName" placeholder="David" />
+      </div>
+
+      <div class="mini">
+        <strong>State:</strong>
+        <select id="stateSel"></select>
+        <span class="badge info" id="modelBadge">Model: —</span>
+      </div>
+    </div>
+
+    <div class="topbar-right">
+      <button class="btn btn-ghost" type="button" id="btnGoOpener">Opener</button>
+      <button class="btn btn-ghost" type="button" id="btnGoPost">Post-Credit</button>
+      <button class="btn btn-ghost" type="button" id="btnGoEnroll">Enroll</button>
+      <button class="btn btn-ghost" type="button" id="btnGoObj">Objections</button>
+      <button class="btn btn-danger" type="button" id="btnReset">Reset</button>
+    </div>
+  </div>
+
+  <!-- STEP TRACKER -->
+  <div class="tracker">
+    <div class="tr-row">
+      <div class="steps">
+        <div class="step-pill active" data-tab="tabOpener">
+          <span class="dot" id="dotOpener"></span>
+          1) Opener
+        </div>
+        <div class="step-pill" data-tab="tabPost">
+          <span class="dot" id="dotPost"></span>
+          2) Post-Credit
+        </div>
+        <div class="step-pill" data-tab="tabEnroll">
+          <span class="dot" id="dotEnroll"></span>
+          3) Enroll
+        </div>
+        <div class="step-pill" data-tab="tabObj">
+          <span class="dot" id="dotObj"></span>
+          4) Objections
+        </div>
+      </div>
+
+      <div class="tr-status">
+        <span class="badge danger" id="gateSoftPull">Soft Pull: NO</span>
+        <span class="badge danger" id="gateSalesTool">SalesTool: NO</span>
+        <span class="badge danger" id="gateBudget">Budget: NO</span>
+        <span class="badge danger" id="gatePreReview">Pre-Review: NO</span>
+        <span class="badge danger" id="gateRecording">Recording: NO</span>
+      </div>
+    </div>
+    <div class="tiny" style="margin-top:6px">
+      Brutal rule: if a badge is red, you do not move forward. Fix the red.
+    </div>
+  </div>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="tabOpener">1) Opener</button>
+    <button class="tab-btn" data-tab="tabPost">2) Post-Credit</button>
+    <button class="tab-btn" data-tab="tabEnroll">3) Enroll</button>
+    <button class="tab-btn" data-tab="tabObj">4) Objections</button>
+  </div>
+
+  <!-- =========================
+       TAB 1: OPENER
+       ========================= -->
+  <div id="tabOpener" class="tab-content active">
+    <div class="card">
+      <h2>Opener (control first)</h2>
+      <p class="hint">Ask → pause → silence. No explaining. No “rep-splaining.”</p>
+
+      <div class="quote" id="openerScript">
+“Client Name”, this is “Reps Name” at JG Wentworth on a recorded line, it looks like you were looking for some help with debt? (Pause) shhh
+      </div>
+
+      <hr class="divider" />
+
+      <h3>NSL State Popup (auto)</h3>
+      <div class="script" id="nslPopup">
+Select a state. If it’s NSL, this box becomes mandatory and must be read BEFORE verifying client details.
+      </div>
+
+      <div class="warnbox" id="warnNSLVerify">
+STOP — NSL popup must be read BEFORE client details.
+      </div>
+
+      <hr class="divider" />
+
+      <h3>Client Details + Soft Pull Gate</h3>
+      <div class="checkgrid">
+        <input type="checkbox" id="chkNSLRead">
+        <label for="chkNSLRead"><strong>NSL only:</strong> I read the NSL popup BEFORE verifying client details</label>
+
+        <input type="checkbox" id="chkClientVerified">
+        <label for="chkClientVerified">Client details verified (name, DOB, address, city, state, zip) → “Does that all sound accurate?”</label>
+
+        <input type="checkbox" id="chkSSN5Zeros">
+        <label for="chkSSN5Zeros">SSN entry process used: type “00000” then ask for last 4 → 000001234</label>
+
+        <input type="checkbox" id="chkSaveThenCreditTab">
+        <label for="chkSaveThenCreditTab">Clicked SAVE → then clicked Credit Tab</label>
+
+        <input type="checkbox" id="chkSoftPullRead">
+        <label for="chkSoftPullRead">Soft pull authorization read verbatim</label>
+
+        <input type="checkbox" id="chkSoftPullYes">
+        <label for="chkSoftPullYes">Client said YES to soft pull authorization</label>
+
+        <input type="checkbox" id="chkAuthPullImport">
+        <label for="chkAuthPullImport">Authorization tab → Pull Credit → IMPORT</label>
+
+        <input type="checkbox" id="chkEnrollableCheck">
+        <label for="chkEnrollableCheck">Said: “I see you have $_____ in enrollable debt and you are paying $_____ a month — is that accurate?”</label>
+
+        <input type="checkbox" id="chkCreditorsSort">
+        <label for="chkCreditorsSort">Creditors tab: clicked header to move checked creditors to top</label>
+      </div>
+
+      <div class="warnbox" id="warnSoftPull">
+DO NOT PROCEED — Soft Pull Gate not complete.
+      </div>
+
+      <div class="footer">
+        <div class="tiny">Gate to Post-Credit requires: Soft Pull read + Yes + Pull/Import.</div>
+        <button class="btn btn-primary" type="button" id="btnToPost">Proceed to Post-Credit →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================
+       TAB 2: POST-CREDIT
+       ========================= -->
+  <div id="tabPost" class="tab-content">
+    <div class="card">
+      <h2>Post-Credit → SalesTool (Reality → Link → Frame)</h2>
+      <p class="hint">This is where reps talk too much. Don’t.</p>
+
+      <h3>1) Reality + Consequence Questions</h3>
+      <div class="quote">
+“While we’re waiting here, I want to understand the situation so I don’t make assumptions.”
+
+1) “How did this start — what was going on when the debt began?”
+(quiet)
+
+2) “When you pay each month… does it feel like it’s mostly interest?”
+(quiet)
+
+3) “How have savings been lately?”
+(quiet)
+
+4) “Any major purchases in the next six months — home, car, anything?”
+(quiet)
+
+5) “Are these cards still used daily… or are they basically bills now?”
+(quiet)
+      </div>
+
+      <hr class="divider" />
+
+      <h3>2) Send SalesTool Link (Gate)</h3>
+      <div class="quote">
+“Now I’m going to send a secure link so you can see what I see on the screen.”
+      </div>
+
+      <div class="checkgrid" style="margin-top:10px">
+        <input type="checkbox" id="chkCalcLocked">
+        <label for="chkCalcLocked">Clicked Calculator → Full circle → Half circle → Check (quote locked)</label>
+
+        <input type="checkbox" id="chkInviteSent">
+        <label for="chkInviteSent">Clicked Envelope → sent SalesTool invite (email + text)</label>
+
+        <input type="checkbox" id="chkConnected">
+        <label for="chkConnected">Client connected (Hello screen shows their name)</label>
+      </div>
+
+      <div class="warnbox" id="warnSalesTool">
+DO NOT PROCEED — SalesTool Gate not complete (invite + connect).
+      </div>
+
+      <hr class="divider" />
+
+      <h3>3) Screen Control</h3>
+      <div class="quote">
+“Turn your phone sideways so it fills the screen.
+
+I’m only using two tabs:
+• Your credit report
+• Your future savings
+
+That way you see it, not just hear it.”
+      </div>
+
+      <h3>4) No-Loan Frame + Good News Pivot</h3>
+      <div class="quote">
+“You didn’t qualify for loan options — mostly utilization/risk.
+
+But I do have good news.
+
+What the approval is for is our interest-free debt restructuring pathway:
+• We work directly with creditors
+• We stop future compounding interest
+• And often reduce principal too
+
+So instead of paying interest, you pay balances down.”
+      </div>
+
+      <h3>5) Two Conditions</h3>
+      <div class="quote">
+“Two conditions so there are no surprises:
+
+1) No more charging once the first deposit runs.
+
+2) Short-term credit impact can happen early while accounts are worked — temporary. As balances drop, most clients are stronger long-term.
+
+Goal: an end date.”
+      </div>
+
+      <div class="footer">
+        <div class="tiny">Gate to Enroll requires SalesTool connected.</div>
+        <button class="btn btn-primary" type="button" id="btnToEnroll">Proceed to Enroll →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================
+       TAB 3: ENROLL
+       ========================= -->
+  <div id="tabEnroll" class="tab-content">
+    <div class="card">
+      <h2>Enroll (Money → ACH → Pre-Review → Recording → Agreement)</h2>
+      <p class="hint"><strong>Money first.</strong> If budget fails, stop. No hero closes.</p>
+
+      <h3>1) Expense Report (Budget Gate)</h3>
+      <div class="quote">
+“Ok so let’s do a quick expense report… when you get paid is it this Friday or next?
+Thank you — after taxes what does your paycheck come out to?”
+      </div>
+
+      <div class="row" style="margin-top:10px">
+        <div class="col">
+          <label for="monthlyIncome">Monthly Income (calculated)</label>
+          <input id="monthlyIncome" type="number" step="1" placeholder="0" />
+          <div class="tiny">If bi-weekly: (paycheck × 26) ÷ 12</div>
+        </div>
+        <div class="col">
+          <label for="monthlyExpenses">Monthly Expenses (total)</label>
+          <input id="monthlyExpenses" type="number" step="1" placeholder="0" />
+          <div class="tiny">Fill all fields in system. Nothing left blank.</div>
+        </div>
+        <div class="col">
+          <label for="monthlyDeposit">Planned Monthly Deposit</label>
+          <input id="monthlyDeposit" type="number" step="1" placeholder="0" />
+        </div>
+      </div>
+
+      <div class="kpi-row">
+        <div class="kpi">
+          <strong>Budget Remaining</strong>
+          <div id="budgetRemaining">$0</div>
+          <div class="tiny">Must be ≥ $75 or NO-GO</div>
+        </div>
+        <div class="kpi">
+          <strong>Budget Gate</strong>
+          <div id="budgetGateText">NOT MET</div>
+          <div class="tiny">Locks ACH until met</div>
+        </div>
+      </div>
+
+      <div class="checkgrid" style="margin-top:10px">
+        <input type="checkbox" id="chkHardshipFilled">
+        <label for="chkHardshipFilled">Hardship dropdown selected + reason typed (required)</label>
+
+        <input type="checkbox" id="chkBudgetSaved">
+        <label for="chkBudgetSaved">Clicked SAVE on Budget/Expense report</label>
+      </div>
+
+      <div class="warnbox" id="warnBudget">
+DO NOT PROCEED — Budget Gate NOT met (needs SAVE + hardship + remaining ≥ $75).
+      </div>
+
+      <hr class="divider" />
+
+      <h3>2) ACH (Locked until Budget Gate MET)</h3>
+      <div class="quote">
+“Which paycheck feels safest for the first deposit?”
+      </div>
+
+      <div class="checkgrid" id="achSection">
+        <input type="checkbox" id="chkPaySchedule">
+        <label for="chkPaySchedule">Confirmed pay schedule</label>
+
+        <input type="checkbox" id="chkPaycheckSafest">
+        <label for="chkPaycheckSafest">Chose paycheck that feels safest</label>
+
+        <input type="checkbox" id="chkFirstDraftDate">
+        <label for="chkFirstDraftDate">Set first draft date (7–14 days out)</label>
+
+        <input type="checkbox" id="chkRepeatDateAmt">
+        <label for="chkRepeatDateAmt">Repeated date + amount back</label>
+
+        <input type="checkbox" id="chkRoutingRepeat">
+        <label for="chkRoutingRepeat">Routing number read + repeated back slowly</label>
+
+        <input type="checkbox" id="chkAccountRepeat">
+        <label for="chkAccountRepeat">Account number read + repeated back slowly</label>
+
+        <input type="checkbox" id="chkCheckingNotSavings">
+        <label for="chkCheckingNotSavings">Confirmed checking (not savings)</label>
+      </div>
+
+      <hr class="divider" />
+
+      <h3>3) Pre-Enrollment Review (First Month)</h3>
+      <div class="quote">
+Send ALL enrollments to pre-review BEFORE sending the agreement (first month).
+
+Email: enrollmentprereview@jgwentworth.com
+CC: manager email, and Director email
+
+Exception: After 6pm ET / weekends → guidelines allow proceeding.
+      </div>
+
+      <div class="row" style="margin-top:10px">
+        <div class="col">
+          <label for="prospectId">Prospect ID</label>
+          <input id="prospectId" placeholder="123456789" />
+        </div>
+        <div class="col">
+          <label for="ccManager">Manager Email</label>
+          <input id="ccManager" placeholder="manager@jgwentworth.com" />
+        </div>
+        <div class="col">
+          <label for="ccDirector">Director Email</label>
+          <input id="ccDirector" placeholder="director@jgwentworth.com" />
+        </div>
+      </div>
+
+      <div class="checkgrid" style="margin-top:10px">
+        <input type="checkbox" id="chkPRSubject">
+        <label for="chkPRSubject">Prospect ID in subject line</label>
+
+        <input type="checkbox" id="chkPRNoLit">
+        <label for="chkPRNoLit">Confirmed no litigation</label>
+
+        <input type="checkbox" id="chkPRGFP">
+        <label for="chkPRGFP">Confirmed good-faith payments</label>
+
+        <input type="checkbox" id="chkPRAddress">
+        <label for="chkPRAddress">Confirmed address matches file</label>
+
+        <input type="checkbox" id="chkPRApproval">
+        <label for="chkPRApproval">Manager approvals confirmed (Under 1k approved by Director)</label>
+
+        <input type="checkbox" id="chkPRNotes">
+        <label for="chkPRNotes">Notes added (reviewer context)</label>
+
+        <input type="checkbox" id="chkAfterHours">
+        <label for="chkAfterHours"><strong>After 6pm ET or Weekend</strong> — proceed without pre-review per guidelines</label>
+
+        <input type="checkbox" id="chkPREmailSent">
+        <label for="chkPREmailSent">Pre-review email sent</label>
+      </div>
+
+      <div class="warnbox" id="warnPreReview">
+DO NOT PROCEED — Pre-Review Gate NOT met (unless After-Hours is checked).
+      </div>
+
+      <hr class="divider" />
+
+      <h3>4) Recording + Disclosures (AUTO by State) — HARD LOCKS</h3>
+      <div class="quote" id="recordingBox">Loading recording script…</div>
+
+      <div class="checkgrid" style="margin-top:10px">
+        <input type="checkbox" id="chkFloridaDisclosureRead">
+        <label for="chkFloridaDisclosureRead"><strong>Florida only:</strong> I read the Florida standard disclosure BEFORE playing recording</label>
+
+        <input type="checkbox" id="chkNSL29Read">
+        <label for="chkNSL29Read"><strong>NSL only:</strong> I read the 29% disclosure BEFORE playing recording</label>
+
+        <input type="checkbox" id="chkRecordingPlayed">
+        <label for="chkRecordingPlayed"><strong>Recording played</strong> (will be disabled until required disclosure is checked)</label>
+      </div>
+
+      <div class="warnbox" id="warnRecording">
+DO NOT PROCEED — Recording Gate NOT met. Required disclosures not confirmed / recording not played.
+      </div>
+
+      <hr class="divider" />
+
+      <h3>5) Agreement Send + Sign (final)</h3>
+      <div class="quote">
+Before sending agreement, confirm:
+1) Details tab: employer/position/years filled
+2) Budget tab: hardship selected + reason paragraph
+3) Warnings tab: pasted + saved (No Lit / GFP / Address)
+4) Pre-review approved (unless after-hours)
+
+Then:
+Document tab → RUN → OK
+Client signs live on phone.
+      </div>
+
+      <div class="footer">
+        <div class="tiny">If recording gate is red, you do not send agreement.</div>
+        <button class="btn btn-primary" type="button" id="btnFinalize" disabled>All Gates Met → Ready to Send Agreement</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================
+       TAB 4: OBJECTIONS
+       ========================= -->
+  <div id="tabObj" class="tab-content">
+    <div class="card">
+      <h2>Objections (short + surgical)</h2>
+      <p class="hint">No speeches. One question. Pause.</p>
+
+      <div class="row">
+        <div class="col">
+          <button class="btn btn-ghost" type="button" data-obj="think">“I need to think about it”</button>
+        </div>
+        <div class="col">
+          <button class="btn btn-ghost" type="button" data-obj="spouse">“I need to talk to spouse”</button>
+        </div>
+        <div class="col">
+          <button class="btn btn-ghost" type="button" data-obj="loan">“I only want a loan”</button>
+        </div>
+      </div>
+
+      <div class="row" style="margin-top:8px">
+        <div class="col">
+          <button class="btn btn-ghost" type="button" data-obj="credit">“If credit drops, no way”</button>
+        </div>
+        <div class="col">
+          <button class="btn btn-danger" type="button" data-obj="reset">Reset / regain control</button>
+        </div>
+      </div>
+
+      <div class="quote" id="objBox" style="margin-top:12px">Tap an objection button.</div>
+
+      <div class="footer">
+        <div class="tiny">Close rule: question → silence → let them reveal the real blocker.</div>
+        <button class="btn btn-ghost" type="button" id="btnCopyObj">Copy</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+/* =========================================
+   States + Models
+   ========================================= */
+const NSL_STATES = new Set([
+  "Connecticut","Delaware","Georgia","Hawaii","Illinois","Kansas",
+  "Maine","Minnesota","New Hampshire","New Jersey","North Dakota",
+  "Ohio","Oregon","Rhode Island","South Carolina","Vermont",
+  "Washington","Wisconsin","Wyoming"
+]);
+const AS_STATES = new Set(["West Virginia"]);
+const STATES = [
+  "Alabama","Alaska","Arizona","Arkansas","California","Colorado","Connecticut","Delaware",
+  "Florida","Georgia","Hawaii","Idaho","Illinois","Indiana","Iowa","Kansas","Kentucky","Louisiana",
+  "Maine","Maryland","Massachusetts","Michigan","Minnesota","Mississippi","Missouri","Montana",
+  "Nebraska","Nevada","New Hampshire","New Jersey","New Mexico","New York","North Carolina",
+  "North Dakota","Ohio","Oklahoma","Oregon","Pennsylvania","Rhode Island",
+  "South Carolina","South Dakota","Tennessee","Texas","Utah","Vermont","Virginia","Washington",
+  "West Virginia","Wisconsin","Wyoming"
+];
+
+function modeFor(state){
+  if(AS_STATES.has(state)) return "WV";
+  if(NSL_STATES.has(state)) return "NSL";
+  return "STANDARD";
+}
+function modelLabel(state){
+  const m = modeFor(state);
+  if(m==="NSL") return "Model: NSL (Attorney)";
+  if(m==="WV") return "Model: WV (A&S)";
+  return "Model: Standard (AADR)";
+}
+
+/* =========================================
+   Helpers
+   ========================================= */
+function $(id){ return document.getElementById(id); }
+function money(n){
+  const x = Number(n||0);
+  return x.toLocaleString(undefined,{style:"currency",currency:"USD",maximumFractionDigits:0});
+}
+function setBadge(el, ok, labelOk, labelNo){
+  if(!el) return;
+  if(ok){
+    el.className = "badge green";
+    el.textContent = labelOk;
+  } else {
+    el.className = "badge danger";
+    el.textContent = labelNo;
+  }
+}
+function showWarn(el, on){
+  if(!el) return;
+  el.classList.toggle("show", !!on);
+}
+
+/* =========================================
+   Tabs + tracker
+   ========================================= */
+function jumpTo(tabId){
+  document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));
+  document.querySelectorAll(".tab-content").forEach(c=>c.classList.remove("active"));
+  document.querySelectorAll(".step-pill").forEach(p=>p.classList.remove("active"));
+
+  const btn = document.querySelector(`.tab-btn[data-tab="${tabId}"]`);
+  if(btn) btn.classList.add("active");
+  const tab = $(tabId);
+  if(tab) tab.classList.add("active");
+
+  const pill = document.querySelector(`.step-pill[data-tab="${tabId}"]`);
+  if(pill) pill.classList.add("active");
+
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+/* =========================================
+   OPENER: NSL popup + Soft Pull authorization text
+   ========================================= */
+function renderOpenerText(){
+  const c = ($("clientName").value||"Client Name").trim() || "Client Name";
+  const r = ($("repName").value||"Reps Name").trim() || "Reps Name";
+  $("openerScript").textContent =
+`“${c}”, this is “${r}” at JG Wentworth on a recorded line, it looks like you were looking for some help with debt? (Pause) shhh`;
+}
+
+function renderNSLPopup(){
+  const state = $("stateSel").value;
+  const mode = modeFor(state);
+
+  if(mode === "NSL"){
+    $("nslPopup").textContent =
+`NEW START LEGAL — PRE-CREDIT FLOW (${state})
+
+PRE-CREDIT FRAME
+“There are many options for getting out of Debt, We’ll review your information to determine which options apply.
+One option may be with New Start Legal — a law firm that provides attorney representation in your state, would you like to hear all the options for getting out of debt?
+
+If they say Yes: Proceed to Client Detail tab and Verify all the Client Details
+
+I have your First name as "First Name and you r LAst Name as "Last name"
+I have your DOB as "DOB"
+I have your Address as "Address Read Slow do n ot miss Apt Number"
+You live in City "City name"
+You live in "${state}"
+and you Zip is "Zip Code"
+
+Then ask: Does that all sound Accurate? Wait for a YES
+
+Then go to the Social Security Section and type in 5 Zeroes "00000" and ask:
+
+Ok so I just need the last 4 of your social so I can get into the rest of your file whenever you are ready.
+
+Then type in last 4 after 5 zeros: 000001234`;
+  } else if(mode === "WV"){
+    $("nslPopup").textContent =
+`WEST VIRGINIA (A&S) — PRE-CREDIT REMINDER
+Follow WV/A&S workbook instructions before proceeding.`;
+  } else {
+    $("nslPopup").textContent =
+`Standard state selected (${state}).
+No NSL popup required. Go straight to Soft Pull Authorization after verifying details.`;
+  }
+
+  // NSL verify warning: if NSL state, must check "NSL popup read" before "client verified"
+  const nslMustReadFirst = (mode==="NSL") && $("chkClientVerified").checked && !$("chkNSLRead").checked;
+  showWarn($("warnNSLVerify"), nslMustReadFirst);
+}
+
+/* Soft Pull authorization (verbatim) */
+const SOFT_PULL_TEXT =
+`“We start with a soft credit check with no negative impact. It lets us confirm what we can assist with. Do I have your authorization to review your credit with you now?”`;
+
+/* =========================================
+   Recording box (AUTO) + Florida lock
+   ========================================= */
+function getRecordingScript(state){
+  const mode = modeFor(state);
+
+  // Always starts the same
+  let t = `“Because you’re in ${state}, there’s a specific disclosure/recording I need to play so everything is compliant.”\n\n`;
+
+  if(mode === "NSL"){
+    t +=
+`NSL DISCLOSURE (READ BEFORE RECORDING):
+The 29% fee is included in your monthly deposit — no separate legal-plan bill.
+
+I’m going to play a brief recording from their attorney to confirm your rights and the program.
+
+Then → Play NSL Recording.`;
+  } else if(mode === "WV"){
+    t +=
+`WV → Attorney Model:
+Then → Play WV Recording.`;
+  } else {
+    t +=
+`AADR / Standard (READ BEFORE RECORDING):
+
+“Since you’re in a standard state, this is a non-attorney debt resolution program. It’s not a loan or bankruptcy.
+
+You build funds in a dedicated account in your name, and we negotiate with creditors.
+
+Your monthly deposit and estimated term include the 25% program fee.
+• No settlement happens without your approval
+• You can cancel at any time
+• Any unearned funds in your dedicated account belong to you
+
+I’m going to play a quick compliance recording to confirm what we discussed.”
+
+Then → Play AADR Recording.`;
+  }
+
+  if(state === "Florida"){
+    t += `\n\nFlorida only: read FL block before agreement.`;
+  }
+
+  return t;
+}
+
+function updateRecordingUI(){
+  const state = $("stateSel").value;
+  $("recordingBox").textContent = getRecordingScript(state);
+
+  // Disclosure checkboxes required depend on state
+  const mode = modeFor(state);
+
+  // Reset irrelevant disclosure checks when state changes (keeps reps honest)
+  if(mode !== "NSL") $("chkNSL29Read").checked = false;
+  if(state !== "Florida") $("chkFloridaDisclosureRead").checked = false;
+
+  // Hard lock: recordingPlayed disabled until required disclosure is checked
+  let allowRecordingCheck = true;
+
+  // If Florida: require Florida standard disclosure checkbox
+  if(state === "Florida"){
+    allowRecordingCheck = allowRecordingCheck && $("chkFloridaDisclosureRead").checked;
+  }
+  // If NSL: require NSL 29% disclosure checkbox
+  if(mode === "NSL"){
+    allowRecordingCheck = allowRecordingCheck && $("chkNSL29Read").checked;
+  }
+
+  // If required disclosure not met, force recordingPlayed off
+  if(!allowRecordingCheck){
+    $("chkRecordingPlayed").checked = false;
+  }
+  $("chkRecordingPlayed").disabled = !allowRecordingCheck;
+}
+
+/* =========================================
+   Gates (badges + do-not-proceed warnings)
+   ========================================= */
+function gateSoftPullMet(){
+  // Must have: soft pull read + yes + pull/import
+  return $("chkSoftPullRead").checked && $("chkSoftPullYes").checked && $("chkAuthPullImport").checked;
+}
+function gateSalesToolMet(){
+  return $("chkInviteSent").checked && $("chkConnected").checked;
+}
+function budgetRemaining(){
+  const income = Number($("monthlyIncome").value||0);
+  const exp = Number($("monthlyExpenses").value||0);
+  const dep = Number($("monthlyDeposit").value||0);
+  return income - exp - dep;
+}
+function gateBudgetMet(){
+  const rem = budgetRemaining();
+  const okNums = rem >= 75;
+  const okFlags = $("chkHardshipFilled").checked && $("chkBudgetSaved").checked;
+  return okNums && okFlags;
+}
+function gatePreReviewMet(){
+  const after = $("chkAfterHours").checked;
+  if(after) return true;
+  const must = ["chkPRSubject","chkPRNoLit","chkPRGFP","chkPRAddress","chkPRApproval","chkPRNotes","chkPREmailSent"];
+  return must.every(id => $(id).checked) && ($("prospectId").value||"").trim().length > 0;
+}
+function gateRecordingMet(){
+  return $("chkRecordingPlayed").checked;
+}
+
+function refreshAllGates(){
+  // Client badge
+  const cn = ($("clientName").value||"").trim();
+  if(cn){
+    $("clientBadge").className = "badge green";
+    $("clientBadge").textContent = "Set";
+  } else {
+    $("clientBadge").className = "badge info";
+    $("clientBadge").textContent = "Not set";
+  }
+
+  // Model badge
+  $("modelBadge").textContent = modelLabel($("stateSel").value);
+
+  // NSL warning logic
+  renderNSLPopup();
+
+  // Soft pull text requirement checkbox (force rep to read it)
+  // We display the soft pull text as a reminder in the opener warning box if they haven't checked read
+  const softPullMissing = !gateSoftPullMet();
+  showWarn($("warnSoftPull"), softPullMissing);
+
+  // SalesTool warning
+  showWarn($("warnSalesTool"), !gateSalesToolMet());
+
+  // Budget KPI
+  const rem = budgetRemaining();
+  $("budgetRemaining").textContent = money(rem);
+  const bgOk = gateBudgetMet();
+  $("budgetGateText").textContent = bgOk ? "MET" : "NOT MET";
+  showWarn($("warnBudget"), !bgOk);
+
+  // ACH lock
+  const achInputs = $("achSection").querySelectorAll("input[type=checkbox]");
+  achInputs.forEach(cb => cb.disabled = !bgOk);
+
+  // Pre-review warning
+  showWarn($("warnPreReview"), !gatePreReviewMet());
+
+  // Recording UI + warning
+  updateRecordingUI();
+  showWarn($("warnRecording"), !gateRecordingMet());
+
+  // Tracker badges
+  setBadge($("gateSoftPull"), gateSoftPullMet(), "Soft Pull: YES", "Soft Pull: NO");
+  setBadge($("gateSalesTool"), gateSalesToolMet(), "SalesTool: YES", "SalesTool: NO");
+  setBadge($("gateBudget"), gateBudgetMet(), "Budget: YES", "Budget: NO");
+  setBadge($("gatePreReview"), gatePreReviewMet(), "Pre-Review: YES", "Pre-Review: NO");
+  setBadge($("gateRecording"), gateRecordingMet(), "Recording: YES", "Recording: NO");
+
+  // Step dots (simple: step is OK if its primary gate is ok)
+  const dot = (id, ok) => {
+    const d = $(id);
+    if(!d) return;
+    d.className = "dot " + (ok ? "ok" : "bad");
+  };
+  dot("dotOpener", gateSoftPullMet());
+  dot("dotPost", gateSalesToolMet());
+  dot("dotEnroll", gateBudgetMet() && gatePreReviewMet() && gateRecordingMet());
+  dot("dotObj", true);
+
+  // Proceed buttons locks
+  $("btnToPost").disabled = !gateSoftPullMet();
+  $("btnToEnroll").disabled = !gateSalesToolMet();
+
+  // Finalize enabled only if all key enroll gates are met
+  const all = gateSoftPullMet() && gateSalesToolMet() && gateBudgetMet() && gatePreReviewMet() && gateRecordingMet();
+  $("btnFinalize").disabled = !all;
+}
+
+/* =========================================
+   Objection scripts (short)
+   ========================================= */
+const OBJ = {
+  think: `“Totally fair. What exactly are you thinking through — the monthly deposit, the credit impact, or something else?”\n(quiet)`,
+  spouse: `“Absolutely. When you talk to them, what will matter most — monthly payment, speed, or credit impact?”\n(quiet)`,
+  loan: `“Understood. If a loan worked exactly like you hoped… where would you be today?”\n(quiet)\n“Have you already tried some version of that before?”\n(quiet)`,
+  credit: `“Makes sense. What is your credit score supposed to make possible — home, car, options?”\n(quiet)\n“And is it being used right now to build that… or to keep balances afloat?”\n(quiet)`,
+  reset: `“Sounds like one key thing is still unclear.\nWhat is it — payment, credit, trust, or something else?”\n(quiet)`
+};
+
+async function copyPlain(text){
+  try{
+    await navigator.clipboard.writeText(text);
+    alert("Copied.");
+  }catch(e){
+    const ta = document.createElement("textarea");
+    ta.value = text;
+    ta.style.position="fixed";
+    ta.style.left="-9999px";
+    document.body.appendChild(ta);
+    ta.focus(); ta.select();
+    const ok = document.execCommand("copy");
+    document.body.removeChild(ta);
+    alert(ok ? "Copied." : "Copy failed — manually copy.");
+  }
+}
+
+/* =========================================
+   Reset
+   ========================================= */
+function resetAll(){
+  // Keep rep name optional; reset everything else
+  const keepRep = ($("repName").value||"").trim();
+
+  document.querySelectorAll("input").forEach(el=>{
+    if(el.type === "checkbox") el.checked = false;
+    else el.value = "";
+  });
+
+  // restore rep name
+  $("repName").value = keepRep || "David";
+
+  // defaults
+  $("stateSel").value = "Florida";
+  renderOpenerText();
+  renderNSLPopup();
+  updateRecordingUI();
+  $("objBox").textContent = "Tap an objection button.";
+  jumpTo("tabOpener");
+  refreshAllGates();
+  alert("Reset complete.");
+}
+
+/* =========================================
+   Init
+   ========================================= */
+document.addEventListener("DOMContentLoaded", ()=>{
+  // Populate states
+  STATES.forEach(s=>{
+    const o = document.createElement("option");
+    o.value = o.textContent = s;
+    $("stateSel").appendChild(o);
+  });
+  $("stateSel").value = "Florida";
+
+  // Tab buttons + step pills
+  document.querySelectorAll(".tab-btn").forEach(btn=>{
+    btn.addEventListener("click", ()=> jumpTo(btn.getAttribute("data-tab")));
+  });
+  document.querySelectorAll(".step-pill").forEach(p=>{
+    p.addEventListener("click", ()=> jumpTo(p.getAttribute("data-tab")));
+  });
+
+  // Topbar nav
+  $("btnGoOpener").addEventListener("click", ()=> jumpTo("tabOpener"));
+  $("btnGoPost").addEventListener("click", ()=> jumpTo("tabPost"));
+  $("btnGoEnroll").addEventListener("click", ()=> jumpTo("tabEnroll"));
+  $("btnGoObj").addEventListener("click", ()=> jumpTo("tabObj"));
+  $("btnReset").addEventListener("click", resetAll);
+
+  // Proceed buttons
+  $("btnToPost").addEventListener("click", ()=>{
+    if(!gateSoftPullMet()){ alert("Soft Pull Gate NOT met. Fix red badges first."); return; }
+    jumpTo("tabPost");
+  });
+  $("btnToEnroll").addEventListener("click", ()=>{
+    if(!gateSalesToolMet()){ alert("SalesTool Gate NOT met. Invite + connect first."); return; }
+    jumpTo("tabEnroll");
+  });
+
+  // Objection buttons
+  document.querySelectorAll("[data-obj]").forEach(b=>{
+    b.addEventListener("click", ()=>{
+      const key = b.getAttribute("data-obj");
+      $("objBox").textContent = OBJ[key] || "";
+    });
+  });
+  $("btnCopyObj").addEventListener("click", ()=>{
+    copyPlain(($("objBox").textContent||"").trim());
+  });
+
+  // Finalize button (enabled only when all gates met)
+  $("btnFinalize").addEventListener("click", ()=>{
+    if($("btnFinalize").disabled){
+      alert("Not ready. Gates still red.");
+      return;
+    }
+    alert("All gates met. Ready to send agreement (Document tab → RUN → OK).");
+  });
+
+  // Soft pull read reminder: no UI box needed, but checkbox exists. We'll refresh gates on any change.
+  const watch = (selector) => document.querySelectorAll(selector).forEach(el=>{
+    el.addEventListener("input", refreshAllGates);
+    el.addEventListener("change", refreshAllGates);
+  });
+
+  watch("input");
+  watch("select");
+  watch("textarea");
+
+  // Update opener with names
+  $("clientName").addEventListener("input", renderOpenerText);
+  $("repName").addEventListener("input", renderOpenerText);
+
+  // State changes: update NSL popup + model + recording locks
+  $("stateSel").addEventListener("change", ()=>{
+    renderNSLPopup();
+    updateRecordingUI();
+    refreshAllGates();
+  });
+
+  // Initial render
+  $("repName").value = $("repName").value || "David";
+  renderOpenerText();
+  renderNSLPopup();
+  updateRecordingUI();
+  refreshAllGates();
+});
+</script>
+</body>
+</html>
