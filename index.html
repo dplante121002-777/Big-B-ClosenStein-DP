@@ -1,902 +1,301 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Big-B ClosenStein — Brutal Cockpit (GitHub Pages)</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>ClosenStein — Control Cockpit (Master)</title>
 
-  <style>
-    :root{
-      --jg-green:#0bb852;
-      --jg-deep:#0a7a3a;
-      --bg:#f5fbf7;
-      --card:#ffffff;
-      --line:#dbe8df;
-      --text:#102316;
-      --muted:#6c7a71;
-      --warn:#ffb100;
-      --danger:#ef4444;
-      --info:#2563eb;
-      --shadow: 0 10px 22px rgba(0,0,0,.06);
-      --radius:14px;
-      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-    }
+<style>
+:root{
+  --jg-green:#0bb852;
+  --jg-deep:#0a7a3a;
+  --bg:#f5fbf7;
+  --card:#ffffff;
+  --line:#dbe8df;
+  --text:#102316;
+  --muted:#6c7a71;
+  --warn:#ffb100;
+  --danger:#ef4444;
+  --info:#2563eb;
+  --shadow: 0 10px 22px rgba(0,0,0,.06);
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  font-size:16px;
+}
+header{
+  position:sticky;top:0;z-index:50;
+  background:#fff;border-bottom:1px solid var(--line);
+  padding:10px 14px;
+  display:flex;align-items:center;gap:12px;
+}
+.logo{
+  width:40px;height:40px;border-radius:10px;
+  background:linear-gradient(135deg,var(--jg-green),var(--jg-deep));
+  display:grid;place-items:center;color:#fff;font-weight:900;font-size:18px;
+  user-select:none;
+}
+h1{margin:0;font-size:16px;line-height:1.1}
+.sub{font-size:12px;color:var(--muted);margin-top:2px}
 
-    *{ box-sizing:border-box; }
-    body{
-      margin:0;
-      font-family:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-      background:var(--bg);
-      color:var(--text);
-      font-size:16px;
-    }
+.container{max-width:1100px;margin:14px auto 40px;padding:0 12px 20px}
 
-    header{
-      position:sticky; top:0; z-index:50;
-      background:#fff;
-      border-bottom:1px solid var(--line);
-      padding:10px 14px;
-      display:flex; align-items:center; justify-content:space-between; gap:12px;
-    }
-    .brand{
-      display:flex; align-items:center; gap:12px;
-    }
-    .logo{
-      width:40px;height:40px;border-radius:10px;
-      background:linear-gradient(135deg,var(--jg-green),var(--jg-deep));
-      display:grid;place-items:center;
-      color:#fff; font-weight:900; user-select:none;
-    }
-    .title{
-      line-height:1.1;
-    }
-    .title h1{ margin:0; font-size:17px; }
-    .title .sub{ margin-top:2px; font-size:12px; color:var(--muted); }
+.topbar{
+  background:#fff;border:1px solid var(--line);border-radius:14px;
+  padding:10px 12px;box-shadow:var(--shadow);margin-bottom:10px;
+  display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;
+}
+.left, .right{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
 
-    .container{ max-width:1100px; margin:14px auto 50px; padding:0 12px; }
+.pill{
+  background:#f7fbf8;border:1px solid var(--line);
+  padding:7px 10px;border-radius:999px;
+  display:flex;gap:8px;align-items:center;
+  font-size:12px;color:var(--muted);
+}
+.pill strong{color:var(--text)}
+.pill select, .pill input{
+  font-size:12px;border-radius:999px;border:1px solid #ccd8cf;
+  padding:6px 10px;background:#fff;min-width:160px;
+}
+.pill .tinybtn{
+  border:1px solid var(--line);background:#f0f5f2;color:var(--text);
+  padding:6px 10px;border-radius:999px;font-size:12px;cursor:pointer;
+}
 
-    /* Step tracker */
-    .tracker{
-      background:#fff; border:1px solid var(--line); border-radius:var(--radius);
-      box-shadow:var(--shadow);
-      padding:10px 12px;
-      display:flex; flex-wrap:wrap; gap:8px; align-items:center; justify-content:space-between;
-      margin-bottom:10px;
-    }
-    .steps{ display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
-    .step{
-      display:flex; align-items:center; gap:8px;
-      padding:7px 12px;
-      border-radius:999px;
-      border:1px solid var(--line);
-      background:#f3faf6;
-      color:var(--muted);
-      font-size:13px;
-      user-select:none;
-    }
-    .step .n{
-      width:20px;height:20px;border-radius:999px;
-      display:grid;place-items:center;
-      background:#e7f6ee; color:#0a5230;
-      font-weight:800; font-size:12px;
-    }
-    .step.active{
-      background:var(--jg-deep);
-      color:#fff;
-      border-color:var(--jg-deep);
-      font-weight:800;
-    }
-    .step.active .n{
-      background:rgba(255,255,255,.2);
-      color:#fff;
-    }
-    .step.locked{
-      background:#fff1f2;
-      color:#991b1b;
-      border-color:#fecaca;
-      font-weight:800;
-    }
-    .step.locked .n{
-      background:#fee2e2;
-      color:#991b1b;
-    }
-    .trackerRight{
-      display:flex; flex-wrap:wrap; gap:8px; align-items:center;
-    }
-    .pill{
-      font-size:12px;
-      padding:6px 10px;
-      border-radius:999px;
-      border:1px solid var(--line);
-      background:#f7fbf8;
-      color:var(--muted);
-      display:flex; gap:8px; align-items:center;
-    }
-    .pill strong{ color:#1f2937; }
-    .badge{
-      display:inline-block;
-      padding:3px 9px;
-      border-radius:999px;
-      font-size:12px;
-      border:1px solid var(--line);
-      background:#f5faf7;
-      margin-left:6px;
-    }
-    .badge.ok{ background:#e8fbf0; border-color:#c6e8d0; color:#0a7a3a; font-weight:900; }
-    .badge.no{ background:#fee2e2; border-color:#fecaca; color:#b91c1c; font-weight:900; }
-    .badge.warn{ background:#fff7da; border-color:#fde68a; color:#7a4b00; font-weight:900; }
+.btn{
+  border:none;border-radius:999px;padding:8px 14px;font-size:13px;cursor:pointer;
+  display:inline-flex;align-items:center;gap:6px;white-space:nowrap;
+}
+.btn-primary{background:linear-gradient(135deg,var(--jg-green),var(--jg-deep));color:#fff}
+.btn-ghost{background:#f0f5f2;color:var(--text);border:1px solid var(--line)}
+.btn-danger{background:#fee2e2;color:#991b1b;border:1px solid #fecaca}
 
-    /* Tabs */
-    .tabs{ display:flex; flex-wrap:wrap; gap:6px; margin:10px 0; }
-    .tab-btn{
-      border-radius:999px;
-      border:1px solid var(--line);
-      padding:7px 13px;
-      font-size:14px;
-      cursor:pointer;
-      background:#f3faf6;
-      color:var(--muted);
-    }
-    .tab-btn.active{
-      background:var(--jg-deep);
-      color:#fff;
-      border-color:var(--jg-deep);
-      font-weight:800;
-    }
-    .tab-btn[disabled]{
-      opacity:.45;
-      cursor:not-allowed;
-    }
+.stepper{
+  background:#fff;border:1px solid var(--line);border-radius:14px;
+  padding:10px 12px;box-shadow:var(--shadow);margin-bottom:10px;
+  display:flex;flex-wrap:wrap;gap:8px;align-items:center;
+}
+.step{
+  border:1px solid var(--line);
+  background:#f7fbf8;
+  color:var(--muted);
+  padding:7px 12px;border-radius:999px;
+  font-size:13px;cursor:pointer;user-select:none;
+}
+.step.active{
+  background:#0a7a3a;color:#fff;border-color:#0a7a3a;font-weight:800;
+}
 
-    /* Cards */
-    .card{
-      background:var(--card);
-      border:1px solid var(--line);
-      border-radius:var(--radius);
-      box-shadow:var(--shadow);
-      padding:14px 15px;
-      margin-bottom:10px;
-    }
-    .card h2{ margin:0 0 6px; font-size:18px; }
-    .card h3{ margin:14px 0 6px; font-size:15px; }
-    .hint{ margin:0 0 10px; font-size:13px; color:var(--muted); }
+.card{
+  background:var(--card);border-radius:14px;border:1px solid var(--line);
+  padding:14px 15px;margin-bottom:10px;box-shadow:var(--shadow);
+}
+.card h2{margin:0 0 6px;font-size:17px}
+.hint{margin:0 0 10px;font-size:13px;color:var(--muted)}
 
-    .row{ display:flex; flex-wrap:wrap; gap:10px; }
-    .col{ flex:1 1 240px; }
+.grid{display:flex;flex-wrap:wrap;gap:10px}
+.col{flex:1 1 260px}
 
-    label{ display:block; font-weight:800; font-size:13px; margin:0 0 4px; }
-    input, select, textarea{
-      width:100%;
-      padding:9px 10px;
-      border-radius:12px;
-      border:1px solid #ccd8cf;
-      font-size:14px;
-      font-family:inherit;
-      background:#fff;
-    }
-    textarea{
-      min-height:190px;
-      resize:vertical;
-      font-family:var(--mono);
-      font-size:12px;
-      line-height:1.45;
-      white-space:pre-wrap;
-    }
+label{font-size:13px;font-weight:700;display:block;margin-bottom:5px}
+select, input, textarea{
+  width:100%;padding:9px 10px;border-radius:12px;border:1px solid #ccd8cf;
+  font-family:inherit;font-size:14px;background:#fff;
+}
+textarea{min-height:220px;resize:vertical;white-space:pre-wrap;line-height:1.35}
 
-    .box{
-      border-radius:12px;
-      border:1px dashed var(--line);
-      background:#fafdfb;
-      padding:10px 12px;
-      font-size:14px;
-      white-space:pre-wrap;
-    }
-    .highlight{
-      border-radius:12px;
-      border:2px solid var(--warn);
-      background:#fff9e6;
-      padding:10px 12px;
-      white-space:pre-wrap;
-    }
-    .dangerBox{
-      border-radius:12px;
-      border:2px solid var(--danger);
-      background:#fff1f2;
-      padding:10px 12px;
-      white-space:pre-wrap;
-    }
-    .okBox{
-      border-radius:12px;
-      border:2px solid var(--jg-green);
-      background:#f0fff6;
-      padding:10px 12px;
-      white-space:pre-wrap;
-    }
+.script{
+  border-radius:12px;border:1px dashed var(--line);background:#fafdfb;
+  padding:10px 12px;font-size:14px;white-space:pre-wrap;
+}
+.highlight{
+  border-radius:12px;border:2px solid var(--warn);background:#fff9e6;
+  padding:10px 12px;font-size:14px;white-space:pre-wrap;
+}
+.notice{
+  border-radius:12px;border:1px solid #bfdbfe;background:#eff6ff;
+  padding:10px 12px;font-size:13px;color:#1d4ed8;white-space:pre-wrap;
+}
+.softwarn{
+  border-radius:12px;border:1px solid #fde68a;background:#fff7da;
+  padding:10px 12px;font-size:13px;color:#7a4b00;white-space:pre-wrap;
+  display:none;
+}
+.lockline{
+  display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;
+  margin-top:10px;padding-top:10px;border-top:1px solid var(--line);
+}
+.badge{
+  display:inline-block;padding:3px 8px;border-radius:999px;font-size:12px;
+  border:1px solid var(--line);background:#f5faf7;margin-right:6px;
+}
+.badge.green{background:#e8fbf0;border-color:#c6e8d0;color:#0a7a3a;font-weight:900}
+.badge.info{background:#dbeafe;border-color:#bfdbfe;color:#1d4ed8;font-weight:800}
+.badge.warn{background:#fff7da;border-color:#fde68a;color:#7a4b00;font-weight:900}
+.badge.danger{background:#fee2e2;border-color:#fecaca;color:#b91c1c;font-weight:900}
 
-    .btnRow{ display:flex; flex-wrap:wrap; gap:8px; margin-top:10px; }
-    .btn{
-      border:none;
-      border-radius:999px;
-      padding:9px 14px;
-      font-size:14px;
-      cursor:pointer;
-      display:inline-flex; align-items:center; gap:8px;
-      white-space:nowrap;
-    }
-    .btn-primary{ background:linear-gradient(135deg,var(--jg-green),var(--jg-deep)); color:#fff; }
-    .btn-ghost{ background:#f0f5f2; color:var(--text); border:1px solid var(--line); }
-    .btn-danger{ background:#fee2e2; color:#991b1b; border:1px solid #fecaca; }
-    .btn[disabled]{ opacity:.45; cursor:not-allowed; }
+.inline{display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
+.chk{
+  display:flex;gap:8px;align-items:center;
+  padding:8px 10px;border:1px solid var(--line);border-radius:12px;background:#fff;
+}
+.chk input{width:auto;transform:scale(1.05)}
+.small{font-size:12px;color:var(--muted)}
 
-    .checkgrid{
-      display:grid;
-      grid-template-columns:20px 1fr;
-      gap:8px 10px;
-      align-items:start;
-    }
-    .checkgrid input[type=checkbox]{ margin-top:3px; transform:scale(1.08); }
-    .tiny{ font-size:11px; color:var(--muted); }
+.quickrow{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 0}
+.qbtn{
+  border:1px solid var(--line);
+  background:#f7fbf8;color:#0a5230;
+  padding:8px 10px;border-radius:999px;
+  font-size:13px;font-weight:800;cursor:pointer;
+}
+.qbtn.secondary{background:#f4f6fb;color:#23304f}
+.qbtn.danger{background:#fef2f2;color:#b91c1c;border-color:#fecaca}
 
-    .split{
-      display:grid;
-      grid-template-columns: 1.1fr .9fr;
-      gap:10px;
-    }
-    @media (max-width: 920px){
-      .split{ grid-template-columns:1fr; }
-    }
-
-    .divider{ border:none; border-top:1px solid var(--line); margin:12px 0; }
-
-    .tab-content{ display:none; }
-    .tab-content.active{ display:block; }
-
-    .toast{
-      position:fixed;
-      bottom:14px;
-      left:50%;
-      transform:translateX(-50%);
-      background:#111827;
-      color:#fff;
-      padding:10px 14px;
-      border-radius:999px;
-      font-size:13px;
-      opacity:0;
-      pointer-events:none;
-      transition:opacity .18s ease;
-      box-shadow: 0 10px 22px rgba(0,0,0,.25);
-      z-index:100;
-    }
-    .toast.show{ opacity:1; }
-  </style>
+hr{border:none;border-top:1px solid var(--line);margin:12px 0}
+</style>
 </head>
 
 <body>
 <header>
-  <div class="brand">
-    <div class="logo">JG</div>
-    <div class="title">
-      <h1>Big-B ClosenStein — Brutal Cockpit</h1>
-      <div class="sub">Flow: Opener → Pull/Import → Reality+Consequence → SalesTool → Enroll → Recording/Disclosures → Agreement</div>
-    </div>
-  </div>
-  <div class="btnRow" style="margin:0;">
-    <button class="btn btn-ghost" type="button" id="btnReset">Reset</button>
+  <div class="logo">JG</div>
+  <div>
+    <h1>ClosenStein — Control Cockpit (Master)</h1>
+    <div class="sub">Comprehensive + effective. Minimal friction. Objections are isolated (no repsplaining).</div>
   </div>
 </header>
 
 <div class="container">
 
-  <!-- Tracker -->
-  <div class="tracker">
-    <div class="steps">
-      <div class="step active" id="s1"><span class="n">1</span>Opener</div>
-      <div class="step locked" id="s2"><span class="n">2</span>Credit Pull</div>
-      <div class="step locked" id="s3"><span class="n">3</span>Post-Credit / SalesTool</div>
-      <div class="step locked" id="s4"><span class="n">4</span>Enroll</div>
-      <div class="step locked" id="s5"><span class="n">5</span>Recording / Legal</div>
-      <div class="step locked" id="s6"><span class="n">6</span>Agreement</div>
-      <div class="step locked" id="s7"><span class="n">7</span>Objections</div>
+  <!-- TOP BAR -->
+  <div class="topbar">
+    <div class="left">
+      <div class="pill">
+        <strong>State:</strong>
+        <select id="stateSelTop"></select>
+        <span class="badge info" id="modelBadgeTop">Model: —</span>
+      </div>
+
+      <div class="pill">
+        <strong>Rep:</strong>
+        <input id="repName" placeholder="Saved once" />
+        <button class="tinybtn" type="button" onclick="saveRepName()">Save</button>
+      </div>
+
+      <div class="pill">
+        <strong>Status:</strong>
+        <span class="badge warn" id="statusSoftPull">Soft Pull: Not yet</span>
+        <span class="badge warn" id="statusRecording">Recording: Not yet</span>
+        <span class="badge warn" id="statusAgreement">Agreement: Locked</span>
+      </div>
     </div>
 
-    <div class="trackerRight">
-      <span class="pill"><strong>State:</strong> <span id="stateTop">—</span></span>
-      <span class="pill"><strong>Model:</strong> <span id="modelTop">—</span></span>
-      <span class="pill"><strong>Soft Pull Auth:</strong><span class="badge no" id="authBadge">NO</span></span>
-      <span class="pill"><strong>Recording:</strong><span class="badge no" id="recBadge">NO</span></span>
-      <span class="pill"><strong>FL TP Block:</strong><span class="badge warn" id="flTpBadge">N/A</span></span>
-    </div>
-  </div>
-
-  <!-- Tabs -->
-  <div class="tabs">
-    <button class="tab-btn active" data-tab="tab1">1) Opener</button>
-    <button class="tab-btn" data-tab="tab2" id="t2" disabled>2) Credit Pull</button>
-    <button class="tab-btn" data-tab="tab3" id="t3" disabled>3) Post-Credit / SalesTool</button>
-    <button class="tab-btn" data-tab="tab4" id="t4" disabled>4) Enroll</button>
-    <button class="tab-btn" data-tab="tab5" id="t5" disabled>5) Recording / Legal</button>
-    <button class="tab-btn" data-tab="tab6" id="t6" disabled>6) Agreement</button>
-    <button class="tab-btn" data-tab="tab7" id="t7" disabled>7) Objections</button>
-  </div>
-
-  <!-- TAB 1: OPENER -->
-  <div id="tab1" class="tab-content active">
-    <div class="card">
-      <h2>1) Opener (control first)</h2>
-      <p class="hint">Pick the client’s state first. Standard opener is always the same. NSL adds the required pre-credit frame popup.</p>
-
-      <div class="row">
-        <div class="col">
-          <label for="repName">Rep Name</label>
-          <input id="repName" placeholder="David" />
-        </div>
-        <div class="col">
-          <label for="clientName">Client Name</label>
-          <input id="clientName" placeholder="Michael" />
-        </div>
-        <div class="col">
-          <label for="clientState">Client State (Pre-Credit)</label>
-          <select id="clientState"></select>
-          <div class="tiny" style="margin-top:6px;">
-            Model auto-detects: <strong>NSL</strong> / <strong>Standard (AADR)</strong> / <strong>WV</strong>
-          </div>
-        </div>
-      </div>
-
-      <hr class="divider"/>
-
-      <h3>Opener Script (Standard + All States)</h3>
-      <div class="highlight" id="openerScript"></div>
-
-      <div class="btnRow">
-        <button class="btn btn-ghost" type="button" id="copyOpener">Copy Opener</button>
-        <button class="btn btn-primary" type="button" id="btnToCredit">Proceed → Credit Pull Step</button>
-      </div>
-
-      <div class="dangerBox" id="openerGate" style="display:none; margin-top:10px;">
-        <strong>STOP.</strong> You must set: Rep Name + Client Name + State.
-      </div>
-
-      <hr class="divider"/>
-
-      <h3>NSL Required Popup (only appears for NSL states)</h3>
-      <div class="box" id="nslPopupBox">Select a state to display.</div>
-
-      <h3>Client Detail Verify Script (Read after NSL “Yes”, or in Standard after opener)</h3>
-      <div class="box" id="verifyScript"></div>
-
-      <h3>SSN Entry Script (required)</h3>
-      <div class="box" id="ssnScript"></div>
-
-      <div class="btnRow">
-        <button class="btn btn-ghost" type="button" id="copyVerify">Copy Verify + SSN</button>
-      </div>
-
-      <p class="tiny" style="margin-top:10px;">
-        Internal workflow reminder: after entering details, click <strong>Save</strong>, then click <strong>Credit</strong> tab.
-      </p>
+    <div class="right">
+      <button class="btn btn-ghost" type="button" onclick="copyFrom('openerScript')">Copy Opener</button>
+      <button class="btn btn-ghost" type="button" onclick="copyFrom('creditScript')">Copy Credit</button>
+      <button class="btn btn-ghost" type="button" onclick="copyFrom('solutionScript')">Copy Solution</button>
+      <button class="btn btn-ghost" type="button" onclick="copyFrom('objectionBox')">Copy Objection</button>
+      <button class="btn btn-primary" type="button" onclick="scrollToId('sectionOpener')">You are here</button>
+      <button class="btn btn-danger" type="button" onclick="resetAll()">Reset</button>
     </div>
   </div>
 
-  <!-- TAB 2: CREDIT PULL -->
-  <div id="tab2" class="tab-content">
-    <div class="card">
-      <h2>2) Credit Pull (brutal and linear)</h2>
-      <p class="hint">Do not freestyle. This tab is your click-path + the one line you say. That’s it.</p>
-
-      <div class="split">
-        <div>
-          <h3>Soft Pull Authorization (ALL STATES)</h3>
-          <div class="highlight" id="softPullScript"></div>
-
-          <div class="checkgrid" style="margin-top:10px;">
-            <input type="checkbox" id="authYes">
-            <label for="authYes"><strong>Client gave authorization (YES)</strong></label>
-          </div>
-
-          <div class="dangerBox" id="authLock" style="display:none; margin-top:10px;">
-            <strong>DO NOT PROCEED.</strong> No authorization = no pull.
-          </div>
-
-          <div class="btnRow">
-            <button class="btn btn-primary" type="button" id="btnAuthProceed">Proceed → Pull Credit / Import</button>
-            <button class="btn btn-ghost" type="button" id="copySoftPull">Copy Soft Pull Script</button>
-          </div>
-
-          <hr class="divider"/>
-
-          <h3>Clicks (do in system)</h3>
-          <div class="box" id="creditClicks"></div>
-
-          <h3>After Import: “Enrollable debt” line</h3>
-          <div class="highlight" id="enrollableLine"></div>
-
-          <h3>Creditor Sort Instruction</h3>
-          <div class="box" id="creditorSort"></div>
-        </div>
-
-        <div>
-          <h3>Status</h3>
-          <div class="box" id="creditStatus"></div>
-
-          <hr class="divider"/>
-
-          <h3>Unlock Next Step</h3>
-          <div class="checkgrid">
-            <input type="checkbox" id="importDone">
-            <label for="importDone">Credit pulled + <strong>IMPORT</strong> completed</label>
-
-            <input type="checkbox" id="accountsViewed">
-            <label for="accountsViewed">Accounts visible + you confirmed “enrollable debt” + monthly pay</label>
-
-            <input type="checkbox" id="creditorsSorted">
-            <label for="creditorsSorted">Creditors sorted so checked boxes appear on top</label>
-          </div>
-
-          <div class="btnRow">
-            <button class="btn btn-primary" type="button" id="btnToSalesTool">Proceed → Post-Credit / SalesTool</button>
-          </div>
-
-          <div class="dangerBox" id="creditGate" style="display:none; margin-top:10px;">
-            <strong>DO NOT PROCEED.</strong> You must complete: Import + Accounts + Creditor sort.
-          </div>
-        </div>
-      </div>
-    </div>
+  <!-- STEPPER -->
+  <div class="stepper" id="stepper">
+    <div class="step active" data-target="sectionOpener">1) Opener</div>
+    <div class="step" data-target="sectionCredit">2) Credit + Reality</div>
+    <div class="step" data-target="sectionSolution">3) Solution</div>
+    <div class="step" data-target="sectionObjections">4) Objections</div>
+    <div class="step" data-target="sectionEnroll">5) Enroll</div>
+    <div class="step" data-target="sectionCompliance">6) Recording + Agreement</div>
   </div>
 
-  <!-- TAB 3: POST-CREDIT / SALESTOOL -->
-  <div id="tab3" class="tab-content">
-    <div class="card">
-      <h2>3) Post-Credit → SalesTool (director order)</h2>
-      <p class="hint">You talk less. Ask. Pause. Move. No empathy fluff in the tool — just reality and consequence.</p>
+  <!-- 1) OPENER -->
+  <div class="card" id="sectionOpener">
+    <h2>1) Opener</h2>
+    <p class="hint">Minimal. Calm. Heavy. One question, then shut up.</p>
 
-      <h3>1) Reality + Consequence (verbatim discipline)</h3>
-      <div class="highlight" id="realityScript"></div>
-
-      <hr class="divider"/>
-
-      <h3>2) Transition + Send SalesTool Link</h3>
-      <div class="highlight" id="transitionScript"></div>
-
-      <h3>Clicks you do (Calculator → lock quote → envelope invite)</h3>
-      <div class="box" id="salesToolClicks"></div>
-
-      <hr class="divider"/>
-
-      <h3>3) Screen Control</h3>
-      <div class="highlight" id="screenControl"></div>
-
-      <hr class="divider"/>
-
-      <h3>4) No-Loan Frame + Good News Pivot</h3>
-      <div class="highlight" id="noLoanPivot"></div>
-
-      <hr class="divider"/>
-
-      <h3>5) Two Conditions (no surprises)</h3>
-      <div class="highlight" id="twoConditions"></div>
-
-      <div class="btnRow">
-        <button class="btn btn-ghost" type="button" id="copySalesToolAll">Copy This Whole Tab</button>
-        <button class="btn btn-primary" type="button" id="btnToEnroll">Proceed → Enroll</button>
+    <div class="grid">
+      <div class="col">
+        <label>Client State (Pre-Credit)</label>
+        <select id="stateSelOpener"></select>
+        <div class="small" id="stateNoteOpener">State drives NSL / Standard / WV logic automatically.</div>
       </div>
 
-      <div class="checkgrid" style="margin-top:12px;">
-        <input type="checkbox" id="salesToolConnected">
-        <label for="salesToolConnected"><strong>SalesTool connected</strong> (they can see the screen)</label>
-
-        <input type="checkbox" id="quoteLocked">
-        <label for="quoteLocked">Calculator quote locked (full circle + half circle, then check shows locked)</label>
-      </div>
-
-      <div class="dangerBox" id="salesToolGate" style="display:none; margin-top:10px;">
-        <strong>DO NOT PROCEED.</strong> SalesTool must be connected AND quote must be locked.
+      <div class="col">
+        <label>Client Name (optional)</label>
+        <input id="clientName" placeholder="Optional (you can leave blank)" />
+        <div class="small">You do NOT need this field to run the call.</div>
       </div>
     </div>
-  </div>
 
-  <!-- TAB 4: ENROLL -->
-  <div id="tab4" class="tab-content">
-    <div class="card">
-      <h2>4) Enroll (banking + pre-review + hard gates)</h2>
-      <p class="hint"><strong>Banking should feel boring.</strong> If it feels tense, you skipped control and certainty.</p>
+    <hr />
 
-      <h3>ACH Tab — First Deposit / Pay Date</h3>
-      <div class="highlight" id="achFirstDeposit"></div>
-
-      <div class="checkgrid" style="margin-top:10px;">
-        <input type="checkbox" id="paySchedConfirmed"><label for="paySchedConfirmed">Confirm pay schedule</label>
-        <input type="checkbox" id="safePaycheckChosen"><label for="safePaycheckChosen">Choose paycheck that feels safest</label>
-        <input type="checkbox" id="draftDateSet"><label for="draftDateSet">Set first draft date (7–14 days out)</label>
-        <input type="checkbox" id="dateAmountRepeated"><label for="dateAmountRepeated">Repeat date + amount back</label>
-      </div>
-
-      <hr class="divider"/>
-
-      <h3>ACH Tab — Banking Details</h3>
-      <div class="highlight" id="achBankingDetails"></div>
-
-      <div class="checkgrid" style="margin-top:10px;">
-        <input type="checkbox" id="bankName"><label for="bankName">Bank name</label>
-        <input type="checkbox" id="routingRepeat"><label for="routingRepeat">Routing number (repeat back)</label>
-        <input type="checkbox" id="acctRepeat"><label for="acctRepeat">Account number (repeat back)</label>
-        <input type="checkbox" id="checkingNotSavings"><label for="checkingNotSavings">Confirm checking (not savings)</label>
-      </div>
-
-      <hr class="divider"/>
-
-      <h3>PRE-ENROLLMENT REVIEW (mandatory — first month)</h3>
-      <div class="highlight" id="preReviewBlock"></div>
-
-      <div class="row" style="margin-top:10px;">
-        <div class="col">
-          <label for="prospectId">Prospect ID</label>
-          <input id="prospectId" placeholder="123456789" />
-        </div>
-        <div class="col">
-          <label for="managerEmail">Manager Email (CC)</label>
-          <input id="managerEmail" placeholder="manager@jgwentworth.com" />
-        </div>
-        <div class="col">
-          <label for="directorEmail">Director Email (CC)</label>
-          <input id="directorEmail" placeholder="director@jgwentworth.com" />
-        </div>
-      </div>
-
-      <div class="checkgrid" style="margin-top:10px;">
-        <input type="checkbox" id="pr_subject"><label for="pr_subject">Prospect ID in subject line</label>
-        <input type="checkbox" id="pr_nolit"><label for="pr_nolit">Confirmed no litigation</label>
-        <input type="checkbox" id="pr_gfp"><label for="pr_gfp">Confirmed good-faith payments</label>
-        <input type="checkbox" id="pr_addr"><label for="pr_addr">Confirmed address matches file</label>
-        <input type="checkbox" id="pr_mgrok"><label for="pr_mgrok">Manager approvals confirmed (under $1k approved by Director)</label>
-        <input type="checkbox" id="pr_notes"><label for="pr_notes">Notes added (reviewer context)</label>
-        <input type="checkbox" id="pr_afterhours"><label for="pr_afterhours"><strong>After 6pm ET or Weekend</strong> — guidelines allow proceeding without pre-review</label>
-      </div>
-
-      <div class="btnRow">
-        <button class="btn btn-primary" type="button" id="btnBuildPreReview">Build Pre-Review Email</button>
-        <button class="btn btn-ghost" type="button" id="btnCopyPreReview">Copy Pre-Review Email</button>
-      </div>
-
-      <textarea id="preReviewEmail" placeholder="Pre-review email will appear here…"></textarea>
-
-      <div class="dangerBox" id="enrollGate" style="display:none; margin-top:10px;">
-        <strong>DO NOT PROCEED.</strong> You must complete: pay schedule + banking + (pre-review checklist OR afterhours).
-      </div>
-
-      <div class="btnRow">
-        <button class="btn btn-primary" type="button" id="btnToRecording">Proceed → Recording / Legal</button>
-      </div>
+    <div class="highlight" id="openerScript">
+"Client Name", this is "Reps Name" at JG Wentworth on a recorded line, it looks like you were looking for some help with debt? (Pause) shhh
     </div>
-  </div>
 
-  <!-- TAB 5: RECORDING / LEGAL -->
-  <div id="tab5" class="tab-content">
-    <div class="card">
-      <h2>5) Recording / Legal (forced locks)</h2>
-      <p class="hint">This tab enforces the order: disclosure → recording → (Florida TP block) → unlock Agreement.</p>
-
-      <h3>Start Line (ALL STATES)</h3>
-      <div class="highlight" id="recordingIntro"></div>
-
-      <hr class="divider"/>
-
-      <h3>State Model</h3>
-      <div class="box" id="modelExplain"></div>
-
-      <hr class="divider"/>
-
-      <h3>Required Disclosure (state-locked)</h3>
-      <div class="highlight" id="requiredDisclosure"></div>
-
-      <div class="checkgrid" style="margin-top:10px;">
-        <input type="checkbox" id="disclosureRead">
-        <label for="disclosureRead"><strong>Disclosure read (required)</strong></label>
-      </div>
-
-      <div class="dangerBox" id="discGate" style="display:none; margin-top:10px;">
-        <strong>LOCKED.</strong> If Florida: you must read the standard disclosure before playing recording. If NSL: you must read the 29% inclusion disclosure before playing the attorney recording.
-      </div>
-
-      <hr class="divider"/>
-
-      <h3>Play Recording (state-locked)</h3>
-      <div class="box" id="recordingToPlay"></div>
-
-      <div class="checkgrid" style="margin-top:10px;">
-        <input type="checkbox" id="recordingPlayed">
-        <label for="recordingPlayed"><strong>Recording played</strong></label>
-      </div>
-
-      <hr class="divider"/>
-
-      <h3>Florida Only: TP License Block (must be read AFTER recording, BEFORE agreement)</h3>
-      <div class="highlight" id="flTpBlock"></div>
-
-      <div class="checkgrid" style="margin-top:10px;">
-        <input type="checkbox" id="flTpRead">
-        <label for="flTpRead"><strong>Florida TP block read (if Florida)</strong></label>
-      </div>
-
-      <div class="dangerBox" id="flTpGate" style="display:none; margin-top:10px;">
-        <strong>LOCKED (Florida).</strong> You must read the Florida TP block after the recording before you can send agreement.
-      </div>
-
-      <div class="btnRow">
-        <button class="btn btn-primary" type="button" id="btnToAgreement">Proceed → Agreement</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- TAB 6: AGREEMENT -->
-  <div id="tab6" class="tab-content">
-    <div class="card">
-      <h2>6) Agreement (hard gates)</h2>
-      <p class="hint">If any prerequisite is missing, you cannot proceed. This prevents compliance mistakes.</p>
-
-      <h3>Before sending agreement, confirm:</h3>
-      <div class="checkgrid">
-        <input type="checkbox" id="detailsFilled"><label for="detailsFilled">Details tab: Position/Employer/Years filled in</label>
-        <input type="checkbox" id="hardshipFilled"><label for="hardshipFilled">Hardship dropdown + reason paragraph filled in</label>
-        <input type="checkbox" id="warningsSaved"><label for="warningsSaved">Warnings pasted + saved (No Lit, GFP, Address)</label>
-        <input type="checkbox" id="preReviewApproved"><label for="preReviewApproved">Pre-enrollment pre-review approved (unless afterhours)</label>
-      </div>
-
-      <div class="dangerBox" id="agreementGate" style="display:none; margin-top:10px;">
-        <strong>DO NOT SEND AGREEMENT.</strong> Missing required prerequisites.
-      </div>
-
-      <hr class="divider"/>
-
-      <h3>Send Agreement Script</h3>
-      <div class="highlight" id="sendAgreementScript"></div>
-
-      <h3>Clicks (system)</h3>
-      <div class="box" id="agreementClicks"></div>
-
-      <div class="btnRow">
-        <button class="btn btn-ghost" type="button" id="copyAgreement">Copy Agreement Script</button>
-        <button class="btn btn-primary" type="button" id="btnOpenObjections">Open Objections Toolkit</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- TAB 7: OBJECTIONS -->
-  <div id="tab7" class="tab-content">
-    <div class="card">
-      <h2>7) Objections (stop repsplaining)</h2>
-      <p class="hint">Short. Controlled. One question. Then next step. No lectures. If they “think,” you isolate the ONE missing variable.</p>
-
-      <div class="row">
-        <div class="col">
-          <label>Pick Objection</label>
-          <select id="objPick">
-            <option value="think">“I need to think about it”</option>
-            <option value="spouse">“I need to talk to my spouse”</option>
-            <option value="credit">“I don’t want my credit to drop”</option>
-            <option value="loan">“I only want a loan”</option>
-            <option value="trust">“I’m not sure I trust this”</option>
-            <option value="stall">General stall / too much info</option>
-          </select>
-        </div>
-        <div class="col">
-          <label>Output</label>
-          <textarea id="objOutput"></textarea>
-        </div>
-      </div>
-
-      <div class="btnRow">
-        <button class="btn btn-primary" type="button" id="genObj">Generate</button>
-        <button class="btn btn-ghost" type="button" id="copyObj">Copy</button>
-      </div>
-
-      <hr class="divider"/>
-
-      <h3>One Rule (for “think about it”)</h3>
-      <div class="highlight" id="thinkRule"></div>
-    </div>
-  </div>
-
-</div>
-
-<div class="toast" id="toast">Copied</div>
-
-<script>
-  // ----------------------------
-  // State model sets (NSL / WV / Standard(AADR))
-  // ----------------------------
-  const NSL_STATES = new Set([
-    "Connecticut","Delaware","Georgia","Hawaii","Illinois","Kansas",
-    "Maine","Minnesota","New Hampshire","New Jersey","North Dakota",
-    "Ohio","Oregon","Rhode Island","South Carolina","Vermont",
-    "Washington","Wisconsin","Wyoming"
-  ]);
-  const WV_STATES = new Set(["West Virginia"]);
-
-  const STATES = [
-    "Alabama","Alaska","Arizona","Arkansas","California","Colorado","Connecticut","Delaware",
-    "Florida","Georgia","Hawaii","Idaho","Illinois","Indiana","Iowa","Kansas","Kentucky","Louisiana",
-    "Maine","Maryland","Massachusetts","Michigan","Minnesota","Mississippi","Missouri","Montana",
-    "Nebraska","Nevada","New Hampshire","New Jersey","New Mexico","New York","North Carolina",
-    "North Dakota","Ohio","Oklahoma","Oregon","Pennsylvania","Rhode Island","South Carolina",
-    "South Dakota","Tennessee","Texas","Utah","Vermont","Virginia","Washington","West Virginia",
-    "Wisconsin","Wyoming"
-  ];
-
-  function modeForState(state){
-    if(WV_STATES.has(state)) return "WV";
-    if(NSL_STATES.has(state)) return "NSL";
-    return "STD"; // Standard / AADR
-  }
-
-  function modelLabel(mode){
-    if(mode==="NSL") return "NSL (Attorney)";
-    if(mode==="WV") return "WV (Attorney)";
-    return "Standard (AADR)";
-  }
-
-  // ----------------------------
-  // DOM helpers
-  // ----------------------------
-  const $ = (id)=>document.getElementById(id);
-  function toast(msg="Copied"){
-    const t=$("toast");
-    t.textContent=msg;
-    t.classList.add("show");
-    setTimeout(()=>t.classList.remove("show"), 900);
-  }
-  async function copyText(txt){
-    try{
-      await navigator.clipboard.writeText(txt);
-      toast("Copied");
-    }catch(e){
-      // fallback
-      const ta=document.createElement("textarea");
-      ta.value=txt;
-      ta.style.position="fixed";
-      ta.style.left="-9999px";
-      document.body.appendChild(ta);
-      ta.focus(); ta.select();
-      document.execCommand("copy");
-      document.body.removeChild(ta);
-      toast("Copied");
-    }
-  }
-
-  function setStepActive(n){
-    for(let i=1;i<=7;i++){
-      const el=$("s"+i);
-      el.classList.remove("active");
-      // keep locked styling; we toggle separately
-    }
-    $("s"+n).classList.add("active");
-  }
-
-  function lockStep(stepNum, locked){
-    const el=$("s"+stepNum);
-    if(locked) el.classList.add("locked");
-    else el.classList.remove("locked");
-  }
-
-  function enableTab(tabId, enabled){
-    const btn = document.querySelector(`.tab-btn[data-tab="${tabId}"]`);
-    if(!btn) return;
-    btn.disabled = !enabled;
-  }
-
-  function jumpTab(tabId){
-    document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));
-    document.querySelectorAll(".tab-content").forEach(c=>c.classList.remove("active"));
-    const btn = document.querySelector(`.tab-btn[data-tab="${tabId}"]`);
-    const tab = $(tabId);
-    if(btn) btn.classList.add("active");
-    if(tab) tab.classList.add("active");
-    window.scrollTo({top:0,behavior:"smooth"});
-  }
-
-  // ----------------------------
-  // Build scripts
-  // ----------------------------
-  function buildOpener(){
-    const rep = ($("repName").value||"").trim();
-    const client = ($("clientName").value||"").trim();
-    const state = $("clientState").value;
-
-    $("openerGate").style.display = (rep && client && state) ? "none" : "block";
-
-    const opener = `"${client}", this is "${rep}" at JG Wentworth on a recorded line, it looks like you were looking for some help with debt? (Pause) shhh`;
-    $("openerScript").textContent = opener;
-
-    const mode = state ? modeForState(state) : null;
-    if(!state){
-      $("nslPopupBox").textContent = "Select a state to display.";
-    }else if(mode==="NSL"){
-      $("nslPopupBox").textContent =
-`NEW START LEGAL — PRE-CREDIT FLOW (${state})
+    <div class="softwarn" id="nslPopup">
+NEW START LEGAL — PRE-CREDIT FLOW (STATE)
 
 PRE-CREDIT FRAME
 “There are many options for getting out of Debt, We’ll review your information to determine which options apply.
 One option may be with New Start Legal — a law firm that provides attorney representation in your state, would you like to hear all the options for getting out of debt?”
 
-If they say YES: proceed to client details verify (below).`;
-    }else{
-      $("nslPopupBox").textContent =
-`Not an NSL state.
+If they say Yes: Proceed to Client Detail tab and Verify all the Client Details
 
-Use the standard opener only, then verify details.`;
-    }
-
-    $("verifyScript").textContent =
-`Client Details Verify (Read exactly)
-I have your First name as "First Name" and your Last name as "Last name"
+I have your First name as "First Name and you r LAst Name as "Last name"
 I have your DOB as "DOB"
-I have your Address as "Address Read Slow do not miss Apt Number"
+I have your Address as "Address Read Slow do n ot miss Apt Number"
 You live in City "City name"
-You live in "${state || 'State name'}"
-and your Zip is "Zip Code"
+You live in "State name"
+and you Zip is "Zip Code"
 
-Does that all sound Accurate? (Wait for YES)`;
+Then ask question: Does that all sound Accurate? Wait for a YES
 
-    $("ssnScript").textContent =
-`SSN Entry (Required)
-Go to the Social Security section and type 5 zeros: "00000" then say:
+Then go to the Social Security Section and type in 5 Zeroes "00000 and ask
 
-“Ok so I just need the last 4 of your social so I can get into the rest of your file whenever you are ready.”
+Ok so I just need the last 4 of your social so I can get into the rest of your file whenever you are ready.
+Then type in the last 4 digits after the 5 Zeroes 000001234
 
-Then type the last 4 digits after the 5 zeros like: 000001234
+Then Click Save Button
+After save button click the Credit Tab
+    </div>
 
-Then click SAVE.
-After Save: click the CREDIT tab.`;
+    <div class="notice" style="margin-top:10px">
+Soft Pull Authorization (ALL STATES):
+“We start with a soft credit check with no negative impact. It lets us confirm what we can assist with. Do I have your authorization to review your credit with you now?”
+If yes: Click Authorization Tab → Pull Credit Tab → IMPORT
+Then pull up Accounts and say:
+“I see you have $xxxxx dollars in enrollable debt that's not secured and you are paying $xxxxx a month — is that about accurate?” (Pause)
+Then on Creditors tab click the top of header for checked boxes so checked creditors rise to the top.
+    </div>
 
-    // Top tracker
-    if(state){
-      const mode2 = modeForState(state);
-      $("stateTop").textContent = state;
-      $("modelTop").textContent = modelLabel(mode2);
-      $("flTpBadge").textContent = (state==="Florida") ? "REQUIRED" : "N/A";
-      $("flTpBadge").className = "badge " + ((state==="Florida") ? "warn" : "warn");
-    }else{
-      $("stateTop").textContent = "—";
-      $("modelTop").textContent = "—";
-      $("flTpBadge").textContent = "N/A";
-      $("flTpBadge").className = "badge warn";
-    }
+    <div class="lockline">
+      <div class="inline">
+        <label class="chk" style="margin:0">
+          <input type="checkbox" id="softPullChk" />
+          Soft Pull Authorized (click once)
+        </label>
+        <span class="small">Only pre-credit control we keep.</span>
+      </div>
+      <button class="btn btn-primary" type="button" onclick="goNext('sectionCredit')">Next → Credit + Reality</button>
+    </div>
+  </div>
 
-    // Update disclosures in tab 5 too
-    buildRecordingDisclosure();
-  }
+  <!-- 2) CREDIT + REALITY -->
+  <div class="card" id="sectionCredit">
+    <h2>2) Post-Credit → SalesTool (Reality + Consequence)</h2>
+    <p class="hint">Do NOT repsplain. Ask. Pause. Let them talk. One pass.</p>
 
-  function buildSoftPull(){
-    $("softPullScript").textContent =
-`“We start with a soft credit check with no negative impact. It lets us confirm what we can assist with. Do I have your authorization to review your credit with you now?”`;
+    <div class="highlight" id="creditScript">
+1) Reality + Consequence (verbatim discipline)
 
-    $("creditClicks").textContent =
-`Clicks (System)
-1) Click Authorization tab
-2) Click Pull Credit
-3) Click IMPORT button`;
-
-    $("enrollableLine").textContent =
-`After Import say:
-“I see you have $xxxxx dollars in enrollable debt that’s not secured and you are paying $xxxxx a month — is that about accurate?” (Pause)`;
-
-    $("creditorSort").textContent =
-`Creditor Tab:
-Click the header for the checked boxes so all checked creditors move to the TOP.`;
-
-    $("creditStatus").textContent =
-`Unlock conditions to proceed:
-✓ Authorization YES
-✓ Pull credit + IMPORT completed
-✓ Accounts visible + “enrollable debt” confirmed
-✓ Creditors sorted (checked at top)`;
-  }
-
-  function buildSalesToolTab(){
-    $("realityScript").textContent =
-`“While we’re waiting here, I want to understand the situation so I don’t make assumptions.”
+“While we’re waiting here, I want to understand the situation so I don’t make assumptions.”
 
 1) “How did this start — what was going on when the debt began?”
 (quiet)
@@ -911,32 +310,31 @@ Click the header for the checked boxes so all checked creditors move to the TOP.
 (quiet)
 
 5) “Are these cards still used daily… or are they basically bills now?”
-(quiet)`;
+(quiet)
 
-    $("transitionScript").textContent =
-`“Now I’m going to send a secure link so you can see what I see on the screen.”`;
+2) Transition + Send SalesTool Link
 
-    $("salesToolClicks").textContent =
-`Clicks (System)
-1) Click CALCULATOR tab
-2) Click FULL CIRCLE then HALF CIRCLE to lock quote
-3) Click CHECK to confirm it shows locked
-4) Click ENVELOPE icon
-5) Send SalesTool invite (Email + Text)
-6) Have customer open the invite
-7) You open Hello screen, wait for their name, then connect`;
+“Now I’m going to send a secure link so you can see what I see on the screen.”
 
-    $("screenControl").textContent =
-`“Turn your phone sideways so it fills the screen.
+→ CLICK ON CALCULATOR tab and click Full Circle then Half Circle to lock in quote then click Check to confirm it’s locked.
+→ Hit Envelope icon
+→ Send SalesTool invite (Email + Text)
+→ Ask customer to look for invitation
+→ Open Hello screen, wait for their name, then connect
+
+3) Screen Control
+
+“Turn your phone sideways so it fills the screen.
 
 I’m only using two tabs:
 • Your credit report
 • Your future savings
 
-That way you see it, not just hear it.”`;
+That way you see it, not just hear it.”
 
-    $("noLoanPivot").textContent =
-`“You didn’t qualify for loan options — mostly utilization/risk.
+4) No-Loan Frame + Good News Pivot
+
+“You didn’t qualify for loan options — mostly utilization/risk.
 
 But I do have good news.
 
@@ -945,565 +343,563 @@ What the approval is for is our interest-free debt restructuring pathway:
 • We stop future compounding interest
 • And often reduce principal too
 
-So instead of paying interest, you pay balances down.”`;
+So instead of paying interest, you pay balances down.”
 
-    $("twoConditions").textContent =
-`“Two conditions so there are no surprises:
+5) Two Conditions
+
+“Two conditions so there are no surprises:
 
 1) No more charging once the first deposit runs.
 
 2) Short-term credit impact can happen early while accounts are worked — temporary. As balances drop, most clients are stronger long-term.
 
-Goal: an end date.”`;
-  }
+Goal: an end date.”
+    </div>
 
-  function buildEnrollTab(){
-    $("achFirstDeposit").textContent =
-`“Which paycheck feels safest for the first deposit?”
+    <div class="softwarn" id="softPullReminder">
+Quick note: You haven’t clicked “Soft Pull Authorized” yet. If you already got the yes, click it now (top of Opener).
+    </div>
 
+    <div class="lockline">
+      <div class="small">If momentum slips: “I feel like something shifted — what’s coming up?” (Stop.)</div>
+      <button class="btn btn-primary" type="button" onclick="goNext('sectionSolution')">Next → Solution</button>
+    </div>
+  </div>
+
+  <!-- 3) SOLUTION -->
+  <div class="card" id="sectionSolution">
+    <h2>3) Solution (Gravity Zone)</h2>
+    <p class="hint">This is where you stop talking. Calm authority. Silence closes.</p>
+
+    <div class="highlight" id="solutionScript">
+Transition to Solution – Calm Authority
+“So based on everything you shared — the balances, the stress, the late nights thinking about it — here’s what we can structurally do.”
+
+Payment Presentation (do this slow)
+• Slow your pace
+• Lower your tone
+• Take one breath
+
+Then:
+“Based on the structure we built, your monthly program payment comes out to $___ per month.”
+(Pause. Do not explain. Do not defend.)
+
+When momentum slips:
+“I feel like something shifted just now. What’s coming up for you?”
+(Stop talking.)
+
+Objection isolation:
+“Is it the amount… or is it the idea of committing today?”
+(Make them choose.)
+    </div>
+
+    <div class="lockline">
+      <div class="small">Rule: after the number, do not speak until they speak.</div>
+      <button class="btn btn-primary" type="button" onclick="goNext('sectionObjections')">Next → Objections</button>
+    </div>
+  </div>
+
+  <!-- 4) OBJECTIONS -->
+  <div class="card" id="sectionObjections">
+    <h2>4) Objections (Isolate → Diagnose → One Question)</h2>
+    <p class="hint">No repsplaining. One question. Silence. Make it specific.</p>
+
+    <div class="quickrow">
+      <button class="qbtn" data-obj="think">Think about it</button>
+      <button class="qbtn" data-obj="amount">Too expensive</button>
+      <button class="qbtn" data-obj="credit">Credit score fear</button>
+      <button class="qbtn" data-obj="spouse">Talk to spouse</button>
+      <button class="qbtn secondary" data-obj="loan">Only want a loan</button>
+      <button class="qbtn secondary" data-obj="trust">Not sure I trust this</button>
+      <button class="qbtn danger" data-obj="reset">Reset momentum</button>
+    </div>
+
+    <div class="highlight" id="objectionBox" style="margin-top:10px">
+Tap an objection above.
+    </div>
+
+    <div class="notice" style="margin-top:10px">
+Universal rule:
+1) Ask a narrowing question.
+2) Shut up.
+3) Mirror their answer in one line.
+4) Ask ONE more question that forces specificity.
+    </div>
+
+    <div class="lockline">
+      <div class="small">If you start explaining, stop and ask: “Which part feels unclear?”</div>
+      <button class="btn btn-primary" type="button" onclick="goNext('sectionEnroll')">Next → Enroll</button>
+    </div>
+  </div>
+
+  <!-- 5) ENROLL -->
+  <div class="card" id="sectionEnroll">
+    <h2>5) Enroll (Expense Report → ACH)</h2>
+    <p class="hint">Simple, calm logistics. No chaos. Keep it boring.</p>
+
+    <div class="script">
+Expense Report:
+“Ok so lets do a quick expense report...when you get paid is it this Friday or next?”
+“Thank you, after taxes what does your paycheck come out to?”
+
+(If bi-weekly: multiply by 26 then divide by 12 to get monthly income.)
+
+Fill out ALL fields (anything not listed = 0, cannot be blank).
+Choose Hardship dropdown and type in reason.
+Hit SAVE.
+
+NOTE: Make sure they are at least $75 positive — or NO GO.
+
+Then go to ACH tab.
+    </div>
+
+    <div class="highlight" style="margin-top:10px">
+ACH TAB:
+
+1) First Deposit / Pay Date
+“Which paycheck feels safest for the first deposit?”
 • Confirm pay schedule
 • Choose paycheck that feels safest
 • Set first draft date (7–14 days out)
-• Repeat date + amount back`;
+• Repeat date + amount back
 
-    $("achBankingDetails").textContent =
-`“Quick recap: we agreed the deposit fits your budget, builds your dedicated account, and nothing happens without your approval.
-
+2) Banking Details
+“Quick recap: we agreed the deposit fits your budget, builds your dedicated account, and nothing happens without your approval.
 We use the same checking you already pay bills from.
+Read me the routing number — I’ll repeat it back slowly.”
+• Bank name
+• Routing number (repeat back)
+• Account number (repeat back)
+• Confirm checking (not savings)
+    </div>
 
-Read me the routing number — I’ll repeat it back slowly.”`;
+    <div class="lockline">
+      <div class="small">Keep tone low. Banking should feel boring.</div>
+      <button class="btn btn-primary" type="button" onclick="goNext('sectionCompliance')">Next → Recording + Agreement</button>
+    </div>
+  </div>
 
-    $("preReviewBlock").textContent =
-`PRE-ENROLLMENT REVIEW (mandatory — first month)
+  <!-- 6) COMPLIANCE + AGREEMENT -->
+  <div class="card" id="sectionCompliance">
+    <h2>6) State / Recording → Agreement (Invisible Control)</h2>
+    <p class="hint">Compliance shows only what matters for THIS state.</p>
 
-Send ALL enrollments to pre-review BEFORE sending the agreement.
+    <div class="notice" id="stateModelLine">State model loads here…</div>
 
+    <div class="softwarn" id="nslDisclosureBox">
+NSL DISCLOSURE (Read before playing recording)
+
+“The 29% fee is included in your monthly deposit — no separate legal-plan bill.
+
+I’m going to play a brief recording from their attorney to confirm your rights and the program.”
+    </div>
+
+    <div class="softwarn" id="flStandardDisclosureBox">
+FLORIDA (Standard) — Read before playing recording
+
+“Since you’re in a standard state, this is a non-attorney debt resolution program. It’s not a loan or bankruptcy.
+
+You build funds in a dedicated account in your name, and we negotiate with creditors.
+
+Your monthly deposit and estimated term include the 25% program fee.
+• No settlement happens without your approval
+• You can cancel at any time
+• Any unearned funds in your dedicated account belong to you
+
+I’m going to play a quick compliance recording to confirm what we discussed.”
+    </div>
+
+    <div class="highlight" id="recordingIntroBox" style="margin-top:10px">
+“Because you’re in [STATE], there’s a specific disclosure/recording I need to play so everything is compliant.”
+
+Confirm state model:
+NSL → Play NSL Recording
+AADR/Standard → Play AADR Recording
+WV → Play WV Recording
+
+Florida only: read FL block before agreement
+    </div>
+
+    <div class="softwarn" id="flBeforeAgreementBox">
+FLORIDA ONLY — READ BEFORE SENDING AGREEMENT (TP License)
+
+“You may give notice of cancellation to us in writing within 7 business days after receipt of the confirmation. Furthermore JG Wentworth’s policy allows you to cancel at any time and any unearned funds will be returned to you from your dedicated account.
+
+The license number issued by the Florida Department of Agriculture and Consumer Services for the commercial telephone seller is TC5615 and the salesperson TP116151. Our address is 1200 Morris Drive, Chesterbrook, PA 19087.”
+    </div>
+
+    <hr />
+
+    <div class="inline">
+      <label class="chk" style="margin:0">
+        <input type="checkbox" id="recordingChk" />
+        Recording Played (click once)
+      </label>
+      <span class="small">Once checked, Agreement unlocks.</span>
+    </div>
+
+    <div class="softwarn" id="agreementLockNote" style="display:block;margin-top:10px">
+Agreement is locked until Recording Played is checked.
+    </div>
+
+    <div class="lockline">
+      <div class="inline">
+        <button class="btn btn-ghost" type="button" onclick="copyFrom('recordingIntroBox')">Copy Recording Intro</button>
+        <button class="btn btn-ghost" type="button" onclick="copyStateBlock()">Copy State Disclosure</button>
+      </div>
+      <button class="btn btn-primary" id="sendAgreementBtn" type="button" disabled onclick="sendAgreementDemo()">
+        Send Agreement (Unlocked after Recording)
+      </button>
+    </div>
+
+    <div class="script" style="margin-top:10px">
+Pre-Enrollment Review (first month — per your process):
 Email: enrollmentprereview@jgwentworth.com
-CC: your manager email, and Director email
+CC: manager email, director email
 
-Exception: After 6pm ET / weekends → follow guidelines.`;
+Only after approval:
+Document tab → RUN → OK (emails agreement)
+Have client open email and sign while on the phone.
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+/* =========================
+   State / Model Logic
+========================= */
+const NSL_STATES = new Set([
+  "Connecticut","Delaware","Georgia","Hawaii","Illinois","Kansas",
+  "Maine","Minnesota","New Hampshire","New Jersey","North Dakota",
+  "Ohio","Oregon","Rhode Island","South Carolina","Vermont",
+  "Washington","Wisconsin","Wyoming"
+]);
+const WV_STATES = new Set(["West Virginia"]);
+
+const STATES = [
+  "Alabama","Alaska","Arizona","Arkansas","California","Colorado","Connecticut","Delaware",
+  "Florida","Georgia","Hawaii","Idaho","Illinois","Indiana","Iowa","Kansas","Kentucky","Louisiana",
+  "Maine","Maryland","Massachusetts","Michigan","Minnesota","Mississippi","Missouri","Montana",
+  "Nebraska","Nevada","New Hampshire","New Jersey","New Mexico","New York","North Carolina",
+  "North Dakota","Ohio","Oklahoma","Oregon","Pennsylvania","Rhode Island",
+  "South Carolina","South Dakota","Tennessee","Texas","Utah","Vermont","Virginia","Washington",
+  "West Virginia","Wisconsin","Wyoming"
+];
+
+function modeFor(state){
+  if (WV_STATES.has(state)) return "WV";
+  if (NSL_STATES.has(state)) return "NSL";
+  return "STANDARD"; // includes Florida + Colorado as Standard/AADR in this cockpit
+}
+function modelText(state){
+  const m = modeFor(state);
+  if (m==="NSL") return "NSL (Attorney) — 29%";
+  if (m==="WV") return "WV (Attorney) — 29%";
+  return "Standard/AADR — 25%";
+}
+
+function populateStates(){
+  const topsel = document.getElementById("stateSelTop");
+  const openSel = document.getElementById("stateSelOpener");
+  [topsel, openSel].forEach(sel=>{
+    sel.innerHTML = "";
+    STATES.forEach(s=>{
+      const o=document.createElement("option");
+      o.value=o.textContent=s;
+      sel.appendChild(o);
+    });
+  });
+  topsel.value = "Florida";
+  openSel.value = "Florida";
+}
+
+function syncStateEverywhere(state){
+  const top = document.getElementById("stateSelTop");
+  const opener = document.getElementById("stateSelOpener");
+  if (top.value !== state) top.value = state;
+  if (opener.value !== state) opener.value = state;
+
+  document.getElementById("modelBadgeTop").textContent = "Model: " + modelText(state);
+  refreshOpenerScript();
+
+  // NSL popup
+  const m = modeFor(state);
+  const nslBox = document.getElementById("nslPopup");
+  if (m==="NSL"){
+    nslBox.style.display = "block";
+    // ensure state label updates cleanly
+    nslBox.textContent = nslBox.textContent.replaceAll("NEW START LEGAL — PRE-CREDIT FLOW (STATE)","NEW START LEGAL — PRE-CREDIT FLOW ("+state+")");
+  }else{
+    nslBox.style.display = "none";
   }
 
-  function buildRecordingDisclosure(){
-    const state = $("clientState").value;
-    if(!state){
-      $("recordingIntro").textContent = `“Because you’re in [STATE], there’s a specific disclosure/recording I need to play so everything is compliant.”`;
-      $("modelExplain").textContent = `Select a state on Tab 1.`;
-      $("requiredDisclosure").textContent = `Select a state on Tab 1 to load required disclosure.`;
-      $("recordingToPlay").textContent = `Select a state on Tab 1 to load which recording to play.`;
-      $("flTpBlock").textContent = `Florida TP block will appear only if Florida is selected.`;
-      return;
-    }
+  // compliance visibility
+  document.getElementById("stateModelLine").textContent = `State: ${state} • Model: ${modelText(state)}`;
 
-    const mode = modeForState(state);
-    $("recordingIntro").textContent =
-`“Because you’re in ${state}, there’s a specific disclosure/recording I need to play so everything is compliant.”`;
+  const nslDisc = document.getElementById("nslDisclosureBox");
+  const flDisc = document.getElementById("flStandardDisclosureBox");
+  const flBefore = document.getElementById("flBeforeAgreementBox");
 
-    $("modelExplain").textContent =
-`Confirm state model:
+  nslDisc.style.display = "none";
+  flDisc.style.display = "none";
+  flBefore.style.display = "none";
+
+  if (m==="NSL") nslDisc.style.display = "block";
+  if (state==="Florida"){
+    flDisc.style.display = "block";
+    flBefore.style.display = "block";
+  }
+
+  // update recording intro box token safely
+  const rec = document.getElementById("recordingIntroBox");
+  rec.textContent =
+`“Because you’re in ${state}, there’s a specific disclosure/recording I need to play so everything is compliant.”
+
+Confirm state model:
 NSL → Play NSL Recording
 AADR/Standard → Play AADR Recording
 WV → Play WV Recording
 
 Florida only: read FL block before agreement`;
 
-    if(mode==="NSL"){
-      $("requiredDisclosure").textContent =
-`NSL DISCLOSURE (read BEFORE recording)
+  renderSoftPullReminder();
+}
 
-The 29% fee is included in your monthly deposit — no separate legal-plan bill.
+/* =========================
+   Rep name persistence
+========================= */
+function loadRepName(){
+  const saved = localStorage.getItem("repName") || "";
+  const el = document.getElementById("repName");
+  if (saved) el.value = saved;
+}
+function saveRepName(){
+  const el = document.getElementById("repName");
+  localStorage.setItem("repName", (el.value || "").trim());
+}
 
-I’m going to play a brief recording from their attorney to confirm your rights and the program.`;
-      $("recordingToPlay").textContent = `Play: NSL Recording (Attorney)`;
-      $("flTpBlock").textContent = `Not Florida. TP block not applicable.`;
-      $("flTpBadge").textContent = "N/A";
-    } else if(mode==="WV"){
-      $("requiredDisclosure").textContent = `WV: Follow WV disclosure/recording requirements.`;
-      $("recordingToPlay").textContent = `Play: WV Recording`;
-      $("flTpBlock").textContent = `Not Florida. TP block not applicable.`;
-      $("flTpBadge").textContent = "N/A";
-    } else {
-      // Standard/AADR
-      if(state==="Florida"){
-        $("requiredDisclosure").textContent =
-`FLORIDA (Standard / AADR) — Disclosure (read BEFORE recording)
+/* =========================
+   Scripts / copy helpers
+========================= */
+function refreshOpenerScript(){
+  const name = (document.getElementById("clientName").value || "").trim();
+  const rep = (document.getElementById("repName").value || "Reps Name").trim() || "Reps Name";
 
-“Since you’re in a standard state, this is a non-attorney debt resolution program. It’s not a loan or bankruptcy.
+  const openerLine = `"Client Name", this is "Reps Name" at JG Wentworth on a recorded line, it looks like you were looking for some help with debt? (Pause) shhh`;
+  const out = openerLine
+    .replaceAll(`"Client Name"`, name ? `"${name}"` : `"Client Name"`)
+    .replaceAll(`"Reps Name"`, rep);
 
-You build funds in a dedicated account in your name, and we negotiate with creditors.
+  document.getElementById("openerScript").textContent = out;
+}
 
-Your monthly deposit and estimated term include the 25% program fee.
-• No settlement happens without your approval
-• You can cancel at any time
-• Any unearned funds in your dedicated account belong to you
+async function copyFrom(id){
+  const el = document.getElementById(id);
+  const text = el ? (el.value || el.textContent || "") : "";
+  if (!text.trim()) return alert("Nothing to copy.");
+  try{
+    await navigator.clipboard.writeText(text.trim());
+    alert("Copied.");
+  }catch(e){
+    const ta=document.createElement("textarea");
+    ta.value=text.trim(); ta.style.position="fixed"; ta.style.left="-9999px";
+    document.body.appendChild(ta); ta.focus(); ta.select();
+    document.execCommand("copy");
+    document.body.removeChild(ta);
+    alert("Copied.");
+  }
+}
 
-I’m going to play a quick compliance recording to confirm what we discussed.”`;
-        $("recordingToPlay").textContent = `Play: AADR / Standard Recording`;
-        $("flTpBlock").textContent =
-`FLORIDA ONLY — READ AFTER RECORDING, BEFORE SENDING AGREEMENT
+function copyStateBlock(){
+  const state = document.getElementById("stateSelTop").value;
+  const m = modeFor(state);
+  if (m==="NSL") return copyFrom("nslDisclosureBox");
+  if (state==="Florida") return copyFrom("flStandardDisclosureBox");
+  return copyFrom("recordingIntroBox");
+}
 
-“You may give notice of cancellation to us in writing within 7 business days after receipt of the confirmation. Furthermore JG Wentworth’s policy allows you to cancel at any time and any unearned funds will be returned to you from your dedicated account.
+/* =========================
+   Objections (Isolate > Diagnose)
+========================= */
+const OBJECTIONS = {
+  think:
+`“When people say they want to think about it, it’s usually one of two things —
+they’re unsure it works, or unsure it’s right for them.
+Which feels closer?”
+(Stop talking.)`,
 
-The license number issued by the Florida Department of Agriculture and Consumer Services for the commercial telephone seller is TC5615 and the salesperson TP116151. Our address is 1200 Morris Drive, Chesterbrook, PA 19087.”`;
-        $("flTpBadge").textContent = "REQUIRED";
-      } else if(state==="Colorado"){
-        $("requiredDisclosure").textContent =
-`COLORADO (Standard / AADR) — Follow the standard disclosure + AADR recording.
+  amount:
+`“Got it. Is it that the amount is too high —
+or is it that you don’t see how it solves the problem?”
+(Stop talking.)
 
-(If Colorado has additional internal steps in your workbook, add them here.)`;
-        $("recordingToPlay").textContent = `Play: AADR / Standard Recording`;
-        $("flTpBlock").textContent = `Not Florida. TP block not applicable.`;
-        $("flTpBadge").textContent = "N/A";
-      } else {
-        $("requiredDisclosure").textContent =
-`STANDARD / AADR — Disclosure (read BEFORE recording)
+If they say amount:
+“Compared to doing nothing for another 6 months, which costs more?”
+(Stop talking.)`,
 
-“Since you’re in a standard state, this is a non-attorney debt resolution program. It’s not a loan or bankruptcy.
+  credit:
+`“If your score was perfect but the debt was still there, would that actually solve the stress?”
+(Pause.)
 
-You build funds in a dedicated account in your name, and we negotiate with creditors.
+“Right now the balance is the real problem.”
+(Pause.)
 
-Your monthly deposit and estimated term include the 25% program fee.
-• No settlement happens without your approval
-• You can cancel at any time
-• Any unearned funds in your dedicated account belong to you
+“Is your concern the temporary dip —
+or the idea of committing to the process?”
+(Stop talking.)`,
 
-I’m going to play a quick compliance recording to confirm what we discussed.”`;
-        $("recordingToPlay").textContent = `Play: AADR / Standard Recording`;
-        $("flTpBlock").textContent = `Not Florida. TP block not applicable.`;
-        $("flTpBadge").textContent = "N/A";
-      }
+  spouse:
+`“Totally fair. If she asked you why this makes sense, what would you tell her?”
+(Stop talking.)
+
+“Let’s lock in the structure so you can show her exactly what the plan looks like.”`,
+
+  loan:
+`“Most people try loans first.
+Quick question: if a loan worked the way you’re expecting… where would you be right now?”
+(Stop.)
+
+“Have you already tried some version of that before?”
+(Stop.)
+
+“So it didn’t fix it — it delayed it.
+If we can get you an end date without a new loan, would it be a bad idea to compare them?”
+(Stop.)`,
+
+  trust:
+`“Fair. When you say trust, do you mean:
+the company…
+the process…
+or the outcome?”
+(Stop talking.)
+
+(Then mirror ONE line)
+“Got it — so it’s the ____.”
+(Pause.)
+
+“What would you need to see or hear for that to feel solid?”`,
+
+  reset:
+`“I feel like something shifted just now. What’s coming up for you?”
+(Stop talking.)`
+};
+
+function loadObjection(key){
+  const box = document.getElementById("objectionBox");
+  box.textContent = OBJECTIONS[key] || "Tap an objection above.";
+}
+
+/* =========================
+   Stepper + navigation
+========================= */
+function scrollToId(id){
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.scrollIntoView({behavior:"smooth", block:"start"});
+  setActiveStep(id);
+}
+function setActiveStep(targetId){
+  document.querySelectorAll(".step").forEach(s=>s.classList.remove("active"));
+  const step = document.querySelector(`.step[data-target="${targetId}"]`);
+  if (step) step.classList.add("active");
+}
+function goNext(id){
+  if (id==="sectionCredit"){
+    if (!document.getElementById("softPullChk").checked){
+      alert("Reminder: click Soft Pull Authorized if you already got the yes.");
     }
   }
+  scrollToId(id);
+}
 
-  function buildAgreementTab(){
-    $("sendAgreementScript").textContent =
-`“I’m sending the agreement now while we’re on the phone so we walk it together.”`;
+/* =========================
+   Invisible control states
+========================= */
+function renderSoftPullReminder(){
+  const checked = document.getElementById("softPullChk").checked;
+  document.getElementById("softPullReminder").style.display = checked ? "none" : "block";
 
-    $("agreementClicks").textContent =
-`System Steps (after pre-review approval unless afterhours)
-1) Click Document tab
-2) Click RUN
-3) Click OK (emails agreement)
-4) Wait ~45 seconds to 3 minutes
-5) Have client open email and sign while you guide them`;
+  document.getElementById("statusSoftPull").textContent = checked ? "Soft Pull: Yes" : "Soft Pull: Not yet";
+  document.getElementById("statusSoftPull").className = checked ? "badge green" : "badge warn";
+}
+function renderRecordingAndAgreement(){
+  const rec = document.getElementById("recordingChk").checked;
+  document.getElementById("statusRecording").textContent = rec ? "Recording: Yes" : "Recording: Not yet";
+  document.getElementById("statusRecording").className = rec ? "badge green" : "badge warn";
+
+  const btn = document.getElementById("sendAgreementBtn");
+  const note = document.getElementById("agreementLockNote");
+  if (rec){
+    btn.disabled = false;
+    note.style.display = "none";
+    document.getElementById("statusAgreement").textContent = "Agreement: Unlocked";
+    document.getElementById("statusAgreement").className = "badge green";
+  }else{
+    btn.disabled = true;
+    note.style.display = "block";
+    document.getElementById("statusAgreement").textContent = "Agreement: Locked";
+    document.getElementById("statusAgreement").className = "badge warn";
   }
-
-  // ----------------------------
-  // Objection generator (short, controlled)
-  // ----------------------------
-  function objectionScript(kind){
-    const name = ($("clientName").value||"").trim() || "—";
-
-    const scripts = {
-      think:
-`"${name}", totally fair.
-
-Before you hang up, what is the ONE thing you’re thinking about:
-1) the bi-weekly deposit,
-2) the credit impact,
-or 3) trust / “does this actually work”?
-
-(Stop. Let them answer.)
-
-Then:
-“Got it. If I answer that cleanly right now, are you comfortable taking the next step today?”`,
-      spouse:
-`"Totally fair.
-
-When you talk to them, what will matter most:
-1) the monthly deposit,
-2) how fast you’re done,
-or 3) credit impact?
-
-(Stop.)
-
-Then:
-“Do you want me to stay on the line for 2 minutes while you loop them in, or do you want a 10-minute callback later today?”`,
-      credit:
-`"I hear you.
-
-Quick question — are you protecting your score for something real in the next 6 months (home/car),
-or is it mostly fear of it dropping?
-
-(Stop.)
-
-Then:
-“If the score is being used to keep balances afloat right now, does that help you — or trap you?”`,
-      loan:
-`"Totally fair.
-
-If a loan worked the way you want, where would you be right now?
-
-(Stop.)
-
-Then:
-“Have you tried a version of that before?”
-
-(Stop.)
-
-Then:
-“So it didn’t fix it — it delayed it. Want to compare it to a plan with an end date?”`,
-      trust:
-`"Fair.
-
-What part feels risky:
-1) the process,
-2) the money moving,
-or 3) the timeline?
-
-(Stop.)
-
-Then:
-“If I show you that nothing happens without your approval and you can cancel anytime, does that remove the risk?”`,
-      stall:
-`"Sounds like one key piece is still unclear.
-
-Is it:
-1) deposit amount,
-2) timeline,
-3) credit impact,
-or 4) trust?
-
-(Stop.)
-
-Then: “Pick one so I don’t guess.”`
-    };
-
-    return scripts[kind] || scripts.think;
-  }
-
-  // ----------------------------
-  // Gates / locks
-  // ----------------------------
-  function updateLocks(){
-    const state = $("clientState").value;
-    const rep = ($("repName").value||"").trim();
-    const client = ($("clientName").value||"").trim();
-
-    // Step 2 unlocked only if opener fields are set
-    const openerReady = !!(state && rep && client);
-    enableTab("tab2", openerReady);
-    lockStep(2, !openerReady);
-
-    // Auth
-    const auth = $("authYes").checked;
-    $("authBadge").className = "badge " + (auth ? "ok" : "no");
-    $("authBadge").textContent = auth ? "YES" : "NO";
-    $("authLock").style.display = auth ? "none" : "block";
-
-    // Credit pull completion gate for step 3
-    const importOk = $("importDone").checked;
-    const acctOk = $("accountsViewed").checked;
-    const sortOk = $("creditorsSorted").checked;
-    const creditReady = auth && importOk && acctOk && sortOk;
-
-    enableTab("tab3", creditReady);
-    lockStep(3, !creditReady);
-
-    $("creditGate").style.display = creditReady ? "none" : "block";
-
-    // SalesTool gate for step 4
-    const stConn = $("salesToolConnected").checked;
-    const qLock = $("quoteLocked").checked;
-    const salesReady = creditReady && stConn && qLock;
-
-    enableTab("tab4", salesReady);
-    lockStep(4, !salesReady);
-
-    $("salesToolGate").style.display = salesReady ? "none" : "block";
-
-    // Enroll gate for step 5
-    const payOk = $("paySchedConfirmed").checked && $("safePaycheckChosen").checked && $("draftDateSet").checked && $("dateAmountRepeated").checked;
-    const bankOk = $("bankName").checked && $("routingRepeat").checked && $("acctRepeat").checked && $("checkingNotSavings").checked;
-
-    const afterHours = $("pr_afterhours").checked;
-    const prereviewOkCore = $("pr_subject").checked && $("pr_nolit").checked && $("pr_gfp").checked && $("pr_addr").checked && $("pr_mgrok").checked && $("pr_notes").checked;
-    const prereviewOk = afterHours ? true : prereviewOkCore;
-
-    const enrollReady = salesReady && payOk && bankOk && prereviewOk;
-
-    enableTab("tab5", enrollReady);
-    lockStep(5, !enrollReady);
-
-    $("enrollGate").style.display = enrollReady ? "none" : "block";
-
-    // Recording locks
-    const discRead = $("disclosureRead").checked;
-    const recPlayed = $("recordingPlayed").checked;
-
-    $("recBadge").className = "badge " + (recPlayed ? "ok" : "no");
-    $("recBadge").textContent = recPlayed ? "YES" : "NO";
-
-    // Florida TP gate (only if FL)
-    const isFL = (state === "Florida");
-    $("flTpBadge").textContent = isFL ? "REQUIRED" : "N/A";
-    $("flTpBadge").className = "badge " + (isFL ? "warn" : "warn");
-    const flTpOk = isFL ? $("flTpRead").checked : true;
-
-    $("discGate").style.display = discRead ? "none" : "block";
-    $("flTpGate").style.display = (isFL && recPlayed && !flTpOk) ? "block" : "none";
-
-    // Step 6 unlocked when: disclosure read + recording played + FL TP read if FL
-    const recordingReady = enrollReady && discRead && recPlayed && flTpOk;
-    enableTab("tab6", recordingReady);
-    lockStep(6, !recordingReady);
-
-    // Agreement gate (internal checklist)
-    const detailsOk = $("detailsFilled").checked;
-    const hardshipOk = $("hardshipFilled").checked;
-    const warnsOk = $("warningsSaved").checked;
-    const preOk = $("preReviewApproved").checked || afterHours;
-    const agreementReady = recordingReady && detailsOk && hardshipOk && warnsOk && preOk;
-
-    $("agreementGate").style.display = agreementReady ? "none" : "block";
-
-    // Objections unlock once you reach agreement tab
-    enableTab("tab7", true);
-    lockStep(7, false);
-
-    // tracker active step: based on selected tab
-    const activeTabBtn = document.querySelector(".tab-btn.active");
-    if(activeTabBtn){
-      const tab = activeTabBtn.getAttribute("data-tab");
-      const map = { tab1:1, tab2:2, tab3:3, tab4:4, tab5:5, tab6:6, tab7:7 };
-      setStepActive(map[tab] || 1);
-    }
-  }
-
-  // ----------------------------
-  // Pre-review email builder
-  // ----------------------------
-  function buildPreReviewEmail(){
-    const pid = ($("prospectId").value||"").trim() || "________";
-    const mgr = ($("managerEmail").value||"").trim() || "[manager email]";
-    const dir = ($("directorEmail").value||"").trim() || "[director email]";
-
-    const subject = `Prospect ID: ${pid} — Enrollment Pre-Review`;
-    const body =
-`Subject: ${subject}
-
-To: enrollmentprereview@jgwentworth.com
-CC: ${mgr}, ${dir}, [you]
-
-Prospect ID: ${pid}
-Confirm no litigation:
-Confirm good-faith payments:
-Confirmed Address:
-Manager approvals: Under 1k approved by Director
-Exceptions:
-Notes:`.trim();
-
-    $("preReviewEmail").value = body;
-    toast("Pre-review email built");
-  }
-
-  // ----------------------------
-  // Init
-  // ----------------------------
-  function init(){
-    // Fill states
-    const sel = $("clientState");
-    sel.innerHTML = `<option value="">Select…</option>` + STATES.map(s=>`<option value="${s}">${s}</option>`).join("");
-
-    // Defaults
-    $("stateTop").textContent = "—";
-    $("modelTop").textContent = "—";
-
-    buildSoftPull();
-    buildSalesToolTab();
-    buildEnrollTab();
-    buildAgreementTab();
-
-    // Tabs click
-    document.querySelectorAll(".tab-btn").forEach(btn=>{
-      btn.addEventListener("click", ()=>{
-        if(btn.disabled) return;
-        jumpTab(btn.getAttribute("data-tab"));
-        updateLocks();
-      });
-    });
-
-    // Opener state/name changes
-    ["repName","clientName","clientState"].forEach(id=>{
-      $(id).addEventListener("input", ()=>{ buildOpener(); updateLocks(); });
-      $(id).addEventListener("change", ()=>{ buildOpener(); updateLocks(); });
-    });
-
-    // Copy buttons
-    $("copyOpener").addEventListener("click", ()=>copyText($("openerScript").textContent));
-    $("copyVerify").addEventListener("click", ()=>{
-      copyText($("verifyScript").textContent + "\n\n" + $("ssnScript").textContent);
-    });
-    $("copySoftPull").addEventListener("click", ()=>copyText($("softPullScript").textContent));
-    $("copySalesToolAll").addEventListener("click", ()=>{
-      const txt =
-        $("realityScript").textContent + "\n\n" +
-        $("transitionScript").textContent + "\n\n" +
-        $("salesToolClicks").textContent + "\n\n" +
-        $("screenControl").textContent + "\n\n" +
-        $("noLoanPivot").textContent + "\n\n" +
-        $("twoConditions").textContent;
-      copyText(txt);
-    });
-    $("btnBuildPreReview").addEventListener("click", buildPreReviewEmail);
-    $("btnCopyPreReview").addEventListener("click", ()=>{
-      const txt = ($("preReviewEmail").value||"").trim();
-      if(!txt) return toast("Build email first");
-      copyText(txt);
-    });
-    $("copyAgreement").addEventListener("click", ()=>copyText($("sendAgreementScript").textContent + "\n\n" + $("agreementClicks").textContent));
-
-    // Progress buttons
-    $("btnToCredit").addEventListener("click", ()=>{
-      const rep = ($("repName").value||"").trim();
-      const client = ($("clientName").value||"").trim();
-      const state = $("clientState").value;
-      if(!(rep && client && state)){
-        $("openerGate").style.display = "block";
-        return;
-      }
-      enableTab("tab2", true);
-      lockStep(2, false);
-      jumpTab("tab2");
-      updateLocks();
-    });
-
-    $("btnAuthProceed").addEventListener("click", ()=>{
-      if(!$("authYes").checked){
-        $("authLock").style.display = "block";
-        return;
-      }
-      updateLocks();
-    });
-
-    $("btnToSalesTool").addEventListener("click", ()=>{
-      const ok = $("authYes").checked && $("importDone").checked && $("accountsViewed").checked && $("creditorsSorted").checked;
-      if(!ok){
-        $("creditGate").style.display = "block";
-        return;
-      }
-      enableTab("tab3", true);
-      lockStep(3, false);
-      jumpTab("tab3");
-      updateLocks();
-    });
-
-    $("btnToEnroll").addEventListener("click", ()=>{
-      const ok = $("salesToolConnected").checked && $("quoteLocked").checked;
-      if(!ok){
-        $("salesToolGate").style.display = "block";
-        return;
-      }
-      enableTab("tab4", true);
-      lockStep(4, false);
-      jumpTab("tab4");
-      updateLocks();
-    });
-
-    $("btnToRecording").addEventListener("click", ()=>{
-      updateLocks();
-      const tab5Enabled = !$("t5").disabled;
-      if(!tab5Enabled){
-        $("enrollGate").style.display = "block";
-        return;
-      }
-      jumpTab("tab5");
-      updateLocks();
-    });
-
-    $("btnToAgreement").addEventListener("click", ()=>{
-      updateLocks();
-      const tab6Enabled = !$("t6").disabled;
-      if(!tab6Enabled){
-        // show gates
-        if(!$("disclosureRead").checked) $("discGate").style.display = "block";
-        const isFL = $("clientState").value==="Florida";
-        if(isFL && $("recordingPlayed").checked && !$("flTpRead").checked) $("flTpGate").style.display="block";
-        return;
-      }
-      jumpTab("tab6");
-      updateLocks();
-    });
-
-    $("btnOpenObjections").addEventListener("click", ()=>{
-      jumpTab("tab7");
-      updateLocks();
-    });
-
-    // Objections
-    $("genObj").addEventListener("click", ()=>{
-      $("objOutput").value = objectionScript($("objPick").value);
-    });
-    $("copyObj").addEventListener("click", ()=>{
-      const txt = ($("objOutput").value||"").trim();
-      if(!txt) return toast("Generate first");
-      copyText(txt);
-    });
-    $("thinkRule").textContent =
-`Think-About-It Rule:
-Ask ONE isolating question, get the answer, then ask for the next step today.
-If you explain three things at once, you create a new reason to stall.`;
-
-    // Gate listeners (all checkboxes)
-    document.querySelectorAll("input[type=checkbox]").forEach(cb=>{
-      cb.addEventListener("change", updateLocks);
-    });
-
-    // Reset
-    $("btnReset").addEventListener("click", ()=>{
-      // clear inputs
-      document.querySelectorAll("input").forEach(el=>{
-        if(el.type==="checkbox") el.checked=false;
-        else el.value="";
-      });
-      document.querySelectorAll("textarea").forEach(t=>t.value="");
-      $("clientState").value="";
-      $("objPick").value="think";
-      $("objOutput").value="";
-      $("preReviewEmail").value="";
-
-      // relock tabs
-      enableTab("tab2", false);
-      enableTab("tab3", false);
-      enableTab("tab4", false);
-      enableTab("tab5", false);
-      enableTab("tab6", false);
-      enableTab("tab7", false);
-
-      lockStep(2,true); lockStep(3,true); lockStep(4,true); lockStep(5,true); lockStep(6,true); lockStep(7,true);
-
-      $("authBadge").className="badge no"; $("authBadge").textContent="NO";
-      $("recBadge").className="badge no"; $("recBadge").textContent="NO";
-      $("flTpBadge").className="badge warn"; $("flTpBadge").textContent="N/A";
-      $("stateTop").textContent="—";
-      $("modelTop").textContent="—";
-
-      // rebuild text blocks
-      buildOpener();
-      buildSoftPull();
-      buildSalesToolTab();
-      buildEnrollTab();
-      buildRecordingDisclosure();
-      buildAgreementTab();
-
-      // go to tab 1
-      jumpTab("tab1");
-      lockStep(1,false);
-      setStepActive(1);
-      toast("Reset");
-      updateLocks();
-    });
-
-    // Default: show objections tab once app is running (but locked by nav until later) — we unlock on updateLocks
-    enableTab("tab7", true); // tool always available from tracker; but step still "locked" until flow reaches later
-    lockStep(7,true);
-
-    // First render
-    buildOpener();
-    updateLocks();
-  }
-
-  document.addEventListener("DOMContentLoaded", init);
+}
+
+function sendAgreementDemo(){
+  alert("Agreement unlocked.\n\nNext: Document tab → RUN → OK (per your process).");
+}
+
+/* =========================
+   Reset
+========================= */
+function resetAll(){
+  document.getElementById("clientName").value = "";
+  document.getElementById("softPullChk").checked = false;
+  document.getElementById("recordingChk").checked = false;
+
+  document.getElementById("stateSelTop").value = "Florida";
+  document.getElementById("stateSelOpener").value = "Florida";
+
+  loadObjection(""); // reset
+  refreshOpenerScript();
+  syncStateEverywhere("Florida");
+  renderSoftPullReminder();
+  renderRecordingAndAgreement();
+  setActiveStep("sectionOpener");
+  scrollToId("sectionOpener");
+}
+
+/* =========================
+   Init
+========================= */
+document.addEventListener("DOMContentLoaded", ()=>{
+  populateStates();
+  loadRepName();
+
+  document.querySelectorAll(".step").forEach(s=>{
+    s.addEventListener("click", ()=> scrollToId(s.getAttribute("data-target")));
+  });
+
+  document.getElementById("stateSelTop").addEventListener("change", (e)=> syncStateEverywhere(e.target.value));
+  document.getElementById("stateSelOpener").addEventListener("change", (e)=> syncStateEverywhere(e.target.value));
+
+  document.getElementById("repName").addEventListener("input", refreshOpenerScript);
+  document.getElementById("clientName").addEventListener("input", refreshOpenerScript);
+
+  document.getElementById("softPullChk").addEventListener("change", renderSoftPullReminder);
+  document.getElementById("recordingChk").addEventListener("change", renderRecordingAndAgreement);
+
+  // objection buttons
+  document.querySelectorAll("[data-obj]").forEach(btn=>{
+    btn.addEventListener("click", ()=> loadObjection(btn.getAttribute("data-obj")));
+  });
+
+  refreshOpenerScript();
+  syncStateEverywhere("Florida");
+  renderSoftPullReminder();
+  renderRecordingAndAgreement();
+  loadObjection("");
+});
 </script>
+
 </body>
 </html>
