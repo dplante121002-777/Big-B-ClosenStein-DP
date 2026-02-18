@@ -108,10 +108,6 @@ select, input, textarea{
 }
 textarea{min-height:220px;resize:vertical;white-space:pre-wrap;line-height:1.35}
 
-.script{
-  border-radius:12px;border:1px dashed var(--line);background:#fafdfb;
-  padding:10px 12px;font-size:14px;white-space:pre-wrap;
-}
 .highlight{
   border-radius:12px;border:2px solid var(--warn);background:#fff9e6;
   padding:10px 12px;font-size:14px;white-space:pre-wrap;
@@ -165,7 +161,7 @@ hr{border:none;border-top:1px solid var(--line);margin:12px 0}
   <div class="logo">JG</div>
   <div>
     <h1>ClosenStein — Control Cockpit (Master)</h1>
-    <div class="sub">Comprehensive + effective. Minimal friction. Objections are isolated (no repsplaining).</div>
+    <div class="sub">Simple flow. Less talking. Objections are isolated (no repsplaining).</div>
   </div>
 </header>
 
@@ -197,9 +193,7 @@ hr{border:none;border-top:1px solid var(--line);margin:12px 0}
     <div class="right">
       <button class="btn btn-ghost" type="button" onclick="copyFrom('openerScript')">Copy Opener</button>
       <button class="btn btn-ghost" type="button" onclick="copyFrom('creditScript')">Copy Credit</button>
-      <button class="btn btn-ghost" type="button" onclick="copyFrom('solutionScript')">Copy Solution</button>
       <button class="btn btn-ghost" type="button" onclick="copyFrom('objectionBox')">Copy Objection</button>
-      <button class="btn btn-primary" type="button" onclick="scrollToId('sectionOpener')">You are here</button>
       <button class="btn btn-danger" type="button" onclick="resetAll()">Reset</button>
     </div>
   </div>
@@ -208,16 +202,15 @@ hr{border:none;border-top:1px solid var(--line);margin:12px 0}
   <div class="stepper" id="stepper">
     <div class="step active" data-target="sectionOpener">1) Opener</div>
     <div class="step" data-target="sectionCredit">2) Credit + Reality</div>
-    <div class="step" data-target="sectionSolution">3) Solution</div>
-    <div class="step" data-target="sectionObjections">4) Objections</div>
-    <div class="step" data-target="sectionEnroll">5) Enroll</div>
-    <div class="step" data-target="sectionCompliance">6) Recording + Agreement</div>
+    <div class="step" data-target="sectionObjections">3) Objections</div>
+    <div class="step" data-target="sectionEnroll">4) Enroll</div>
+    <div class="step" data-target="sectionCompliance">5) Recording + Agreement</div>
   </div>
 
   <!-- 1) OPENER -->
   <div class="card" id="sectionOpener">
     <h2>1) Opener</h2>
-    <p class="hint">Minimal. Calm. Heavy. One question, then shut up.</p>
+    <p class="hint">One line + one question. Pause.</p>
 
     <div class="grid">
       <div class="col">
@@ -281,7 +274,7 @@ Then on Creditors tab click the top of header for checked boxes so checked credi
           <input type="checkbox" id="softPullChk" />
           Soft Pull Authorized (click once)
         </label>
-        <span class="small">Only pre-credit control we keep.</span>
+        <span class="small">Only pre-credit checkbox we keep.</span>
       </div>
       <button class="btn btn-primary" type="button" onclick="goNext('sectionCredit')">Next → Credit + Reality</button>
     </div>
@@ -289,11 +282,11 @@ Then on Creditors tab click the top of header for checked boxes so checked credi
 
   <!-- 2) CREDIT + REALITY -->
   <div class="card" id="sectionCredit">
-    <h2>2) Post-Credit → SalesTool (Reality + Consequence)</h2>
-    <p class="hint">Do NOT repsplain. Ask. Pause. Let them talk. One pass.</p>
+    <h2>2) Credit + Reality</h2>
+    <p class="hint">Ask the 5 questions. Pause after each. Then screen-share sequence.</p>
 
     <div class="highlight" id="creditScript">
-1) Reality + Consequence (verbatim discipline)
+1) Reality + Consequence
 
 “While we’re waiting here, I want to understand the situation so I don’t make assumptions.”
 
@@ -357,52 +350,19 @@ Goal: an end date.”
     </div>
 
     <div class="softwarn" id="softPullReminder">
-Quick note: You haven’t clicked “Soft Pull Authorized” yet. If you already got the yes, click it now (top of Opener).
+Quick note: You haven’t clicked “Soft Pull Authorized” yet. If you already got the yes, click it now (Opener).
     </div>
 
     <div class="lockline">
-      <div class="small">If momentum slips: “I feel like something shifted — what’s coming up?” (Stop.)</div>
-      <button class="btn btn-primary" type="button" onclick="goNext('sectionSolution')">Next → Solution</button>
-    </div>
-  </div>
-
-  <!-- 3) SOLUTION -->
-  <div class="card" id="sectionSolution">
-    <h2>3) Solution (Gravity Zone)</h2>
-    <p class="hint">This is where you stop talking. Calm authority. Silence closes.</p>
-
-    <div class="highlight" id="solutionScript">
-Transition to Solution – Calm Authority
-“So based on everything you shared — the balances, the stress, the late nights thinking about it — here’s what we can structurally do.”
-
-Payment Presentation (do this slow)
-• Slow your pace
-• Lower your tone
-• Take one breath
-
-Then:
-“Based on the structure we built, your monthly program payment comes out to $___ per month.”
-(Pause. Do not explain. Do not defend.)
-
-When momentum slips:
-“I feel like something shifted just now. What’s coming up for you?”
-(Stop talking.)
-
-Objection isolation:
-“Is it the amount… or is it the idea of committing today?”
-(Make them choose.)
-    </div>
-
-    <div class="lockline">
-      <div class="small">Rule: after the number, do not speak until they speak.</div>
+      <div class="small">If you start explaining: stop and ask “Which part feels unclear?”</div>
       <button class="btn btn-primary" type="button" onclick="goNext('sectionObjections')">Next → Objections</button>
     </div>
   </div>
 
-  <!-- 4) OBJECTIONS -->
+  <!-- 3) OBJECTIONS -->
   <div class="card" id="sectionObjections">
-    <h2>4) Objections (Isolate → Diagnose → One Question)</h2>
-    <p class="hint">No repsplaining. One question. Silence. Make it specific.</p>
+    <h2>3) Objections (Isolate → Diagnose)</h2>
+    <p class="hint">One question. Silence. No repsplaining.</p>
 
     <div class="quickrow">
       <button class="qbtn" data-obj="think">Think about it</button>
@@ -410,34 +370,30 @@ Objection isolation:
       <button class="qbtn" data-obj="credit">Credit score fear</button>
       <button class="qbtn" data-obj="spouse">Talk to spouse</button>
       <button class="qbtn secondary" data-obj="loan">Only want a loan</button>
-      <button class="qbtn secondary" data-obj="trust">Not sure I trust this</button>
+      <button class="qbtn secondary" data-obj="trust">Trust / skeptical</button>
       <button class="qbtn danger" data-obj="reset">Reset momentum</button>
     </div>
 
-    <div class="highlight" id="objectionBox" style="margin-top:10px">
-Tap an objection above.
-    </div>
+    <div class="highlight" id="objectionBox" style="margin-top:10px">Tap an objection above.</div>
 
     <div class="notice" style="margin-top:10px">
-Universal rule:
-1) Ask a narrowing question.
-2) Shut up.
-3) Mirror their answer in one line.
-4) Ask ONE more question that forces specificity.
+Rule:
+Ask → Pause → Mirror one line → Ask one more question.
+If you start explaining, stop and ask: “Which part feels unclear?”
     </div>
 
     <div class="lockline">
-      <div class="small">If you start explaining, stop and ask: “Which part feels unclear?”</div>
+      <div class="small">Default reset line: “I feel like something shifted — what’s coming up?”</div>
       <button class="btn btn-primary" type="button" onclick="goNext('sectionEnroll')">Next → Enroll</button>
     </div>
   </div>
 
-  <!-- 5) ENROLL -->
+  <!-- 4) ENROLL -->
   <div class="card" id="sectionEnroll">
-    <h2>5) Enroll (Expense Report → ACH)</h2>
-    <p class="hint">Simple, calm logistics. No chaos. Keep it boring.</p>
+    <h2>4) Enroll (Expense Report → ACH)</h2>
+    <p class="hint">Boring logistics. Keep it simple.</p>
 
-    <div class="script">
+    <div class="highlight">
 Expense Report:
 “Ok so lets do a quick expense report...when you get paid is it this Friday or next?”
 “Thank you, after taxes what does your paycheck come out to?”
@@ -451,38 +407,22 @@ Hit SAVE.
 NOTE: Make sure they are at least $75 positive — or NO GO.
 
 Then go to ACH tab.
-    </div>
 
-    <div class="highlight" style="margin-top:10px">
 ACH TAB:
-
-1) First Deposit / Pay Date
 “Which paycheck feels safest for the first deposit?”
-• Confirm pay schedule
-• Choose paycheck that feels safest
-• Set first draft date (7–14 days out)
-• Repeat date + amount back
-
-2) Banking Details
-“Quick recap: we agreed the deposit fits your budget, builds your dedicated account, and nothing happens without your approval.
-We use the same checking you already pay bills from.
-Read me the routing number — I’ll repeat it back slowly.”
-• Bank name
-• Routing number (repeat back)
-• Account number (repeat back)
-• Confirm checking (not savings)
+“Read me the routing number — I’ll repeat it back slowly.”
     </div>
 
     <div class="lockline">
-      <div class="small">Keep tone low. Banking should feel boring.</div>
+      <div class="small">If banking feels tense, you skipped clarity. Go back to Objections.</div>
       <button class="btn btn-primary" type="button" onclick="goNext('sectionCompliance')">Next → Recording + Agreement</button>
     </div>
   </div>
 
-  <!-- 6) COMPLIANCE + AGREEMENT -->
+  <!-- 5) COMPLIANCE + AGREEMENT -->
   <div class="card" id="sectionCompliance">
-    <h2>6) State / Recording → Agreement (Invisible Control)</h2>
-    <p class="hint">Compliance shows only what matters for THIS state.</p>
+    <h2>5) Recording + Agreement (State-Locked)</h2>
+    <p class="hint">State content appears automatically.</p>
 
     <div class="notice" id="stateModelLine">State model loads here…</div>
 
@@ -535,7 +475,7 @@ The license number issued by the Florida Department of Agriculture and Consumer 
         <input type="checkbox" id="recordingChk" />
         Recording Played (click once)
       </label>
-      <span class="small">Once checked, Agreement unlocks.</span>
+      <span class="small">Agreement unlocks after this.</span>
     </div>
 
     <div class="softwarn" id="agreementLockNote" style="display:block;margin-top:10px">
@@ -552,7 +492,7 @@ Agreement is locked until Recording Played is checked.
       </button>
     </div>
 
-    <div class="script" style="margin-top:10px">
+    <div class="notice" style="margin-top:10px">
 Pre-Enrollment Review (first month — per your process):
 Email: enrollmentprereview@jgwentworth.com
 CC: manager email, director email
@@ -567,9 +507,7 @@ Have client open email and sign while on the phone.
 </div>
 
 <script>
-/* =========================
-   State / Model Logic
-========================= */
+/* ===== State / Model Logic ===== */
 const NSL_STATES = new Set([
   "Connecticut","Delaware","Georgia","Hawaii","Illinois","Kansas",
   "Maine","Minnesota","New Hampshire","New Jersey","North Dakota",
@@ -591,7 +529,7 @@ const STATES = [
 function modeFor(state){
   if (WV_STATES.has(state)) return "WV";
   if (NSL_STATES.has(state)) return "NSL";
-  return "STANDARD"; // includes Florida + Colorado as Standard/AADR in this cockpit
+  return "STANDARD";
 }
 function modelText(state){
   const m = modeFor(state);
@@ -629,7 +567,6 @@ function syncStateEverywhere(state){
   const nslBox = document.getElementById("nslPopup");
   if (m==="NSL"){
     nslBox.style.display = "block";
-    // ensure state label updates cleanly
     nslBox.textContent = nslBox.textContent.replaceAll("NEW START LEGAL — PRE-CREDIT FLOW (STATE)","NEW START LEGAL — PRE-CREDIT FLOW ("+state+")");
   }else{
     nslBox.style.display = "none";
@@ -652,9 +589,8 @@ function syncStateEverywhere(state){
     flBefore.style.display = "block";
   }
 
-  // update recording intro box token safely
-  const rec = document.getElementById("recordingIntroBox");
-  rec.textContent =
+  // update recording intro box token
+  document.getElementById("recordingIntroBox").textContent =
 `“Because you’re in ${state}, there’s a specific disclosure/recording I need to play so everything is compliant.”
 
 Confirm state model:
@@ -667,9 +603,7 @@ Florida only: read FL block before agreement`;
   renderSoftPullReminder();
 }
 
-/* =========================
-   Rep name persistence
-========================= */
+/* ===== Rep name persistence ===== */
 function loadRepName(){
   const saved = localStorage.getItem("repName") || "";
   const el = document.getElementById("repName");
@@ -680,21 +614,20 @@ function saveRepName(){
   localStorage.setItem("repName", (el.value || "").trim());
 }
 
-/* =========================
-   Scripts / copy helpers
-========================= */
+/* ===== Opener script render ===== */
 function refreshOpenerScript(){
   const name = (document.getElementById("clientName").value || "").trim();
   const rep = (document.getElementById("repName").value || "Reps Name").trim() || "Reps Name";
 
-  const openerLine = `"Client Name", this is "Reps Name" at JG Wentworth on a recorded line, it looks like you were looking for some help with debt? (Pause) shhh`;
-  const out = openerLine
+  const base = `"Client Name", this is "Reps Name" at JG Wentworth on a recorded line, it looks like you were looking for some help with debt? (Pause) shhh`;
+  const out = base
     .replaceAll(`"Client Name"`, name ? `"${name}"` : `"Client Name"`)
     .replaceAll(`"Reps Name"`, rep);
 
   document.getElementById("openerScript").textContent = out;
 }
 
+/* ===== Copy helpers ===== */
 async function copyFrom(id){
   const el = document.getElementById(id);
   const text = el ? (el.value || el.textContent || "") : "";
@@ -711,7 +644,6 @@ async function copyFrom(id){
     alert("Copied.");
   }
 }
-
 function copyStateBlock(){
   const state = document.getElementById("stateSelTop").value;
   const m = modeFor(state);
@@ -720,9 +652,7 @@ function copyStateBlock(){
   return copyFrom("recordingIntroBox");
 }
 
-/* =========================
-   Objections (Isolate > Diagnose)
-========================= */
+/* ===== Objections ===== */
 const OBJECTIONS = {
   think:
 `“When people say they want to think about it, it’s usually one of two things —
@@ -791,9 +721,7 @@ function loadObjection(key){
   box.textContent = OBJECTIONS[key] || "Tap an objection above.";
 }
 
-/* =========================
-   Stepper + navigation
-========================= */
+/* ===== Stepper ===== */
 function scrollToId(id){
   const el = document.getElementById(id);
   if (!el) return;
@@ -814,13 +742,10 @@ function goNext(id){
   scrollToId(id);
 }
 
-/* =========================
-   Invisible control states
-========================= */
+/* ===== Status chips ===== */
 function renderSoftPullReminder(){
   const checked = document.getElementById("softPullChk").checked;
   document.getElementById("softPullReminder").style.display = checked ? "none" : "block";
-
   document.getElementById("statusSoftPull").textContent = checked ? "Soft Pull: Yes" : "Soft Pull: Not yet";
   document.getElementById("statusSoftPull").className = checked ? "badge green" : "badge warn";
 }
@@ -843,14 +768,11 @@ function renderRecordingAndAgreement(){
     document.getElementById("statusAgreement").className = "badge warn";
   }
 }
-
 function sendAgreementDemo(){
   alert("Agreement unlocked.\n\nNext: Document tab → RUN → OK (per your process).");
 }
 
-/* =========================
-   Reset
-========================= */
+/* ===== Reset ===== */
 function resetAll(){
   document.getElementById("clientName").value = "";
   document.getElementById("softPullChk").checked = false;
@@ -859,7 +781,7 @@ function resetAll(){
   document.getElementById("stateSelTop").value = "Florida";
   document.getElementById("stateSelOpener").value = "Florida";
 
-  loadObjection(""); // reset
+  loadObjection("");
   refreshOpenerScript();
   syncStateEverywhere("Florida");
   renderSoftPullReminder();
@@ -868,9 +790,7 @@ function resetAll(){
   scrollToId("sectionOpener");
 }
 
-/* =========================
-   Init
-========================= */
+/* ===== Init ===== */
 document.addEventListener("DOMContentLoaded", ()=>{
   populateStates();
   loadRepName();
@@ -888,7 +808,6 @@ document.addEventListener("DOMContentLoaded", ()=>{
   document.getElementById("softPullChk").addEventListener("change", renderSoftPullReminder);
   document.getElementById("recordingChk").addEventListener("change", renderRecordingAndAgreement);
 
-  // objection buttons
   document.querySelectorAll("[data-obj]").forEach(btn=>{
     btn.addEventListener("click", ()=> loadObjection(btn.getAttribute("data-obj")));
   });
